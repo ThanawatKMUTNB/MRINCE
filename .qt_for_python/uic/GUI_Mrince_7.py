@@ -53,6 +53,7 @@ class Ui_MainWindow(object):
         self.plainTextEdit.setSizePolicy(sizePolicy)
         self.plainTextEdit.setMinimumSize(QtCore.QSize(0, 0))
         self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.plainTextEdit.setAutoFillBackground(True)
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.gridLayout_2.addWidget(self.plainTextEdit, 1, 1, 1, 1)
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
