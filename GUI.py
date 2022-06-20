@@ -1,4 +1,3 @@
-import csv
 from PyQt5 import QtWidgets, uic
 import sys
 import os
@@ -6,8 +5,8 @@ import DataManager
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 import PandasModel
-import  jpype     
-import  asposecells
+# import weasyprint
+# import pdfkit
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -31,22 +30,27 @@ class Ui(QtWidgets.QMainWindow):
     
     def ExportDupCSV(self):
         try:
-            # self.df2
-            file_location = self.CSV1
-            # print(file_location)
-            file_name = os.path.basename(file_location)
-            # print(file_name)
-            newPath = file_location.replace(file_name, "Cleared_"+file_name)
-            self.df2.to_csv(newPath)
-            # print(newPath)
-                 
-            jpype.startJVM() 
-            from asposecells.api import Workbook
-            workbook = Workbook(newPath)
-            pdfPath = newPath.replace(".csv",".pdf")
-            workbook.Save(pdfPath)
-            jpype.shutdownJVM()
-            
+            cols = list(self.df2.columns.values)
+            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
+                # self.df2
+                file_location = self.CSV1
+                # print(file_location)
+                file_name = os.path.basename(file_location)
+                # print(file_name)
+                newPath = file_location.replace(file_name, "Cleared_"+file_name)
+                self.df2.to_csv(newPath)
+                # print(newPath)
+                
+                pdfPath = newPath.replace(".csv",".pdf")
+                htmlPath = newPath.replace(".csv",".html")
+                
+                self.df2.to_html(htmlPath)
+                # doc_pdf = weasyprint.HTML(htmlPath).write_pdf()
+                # open(pdfPath, 'wb').write(doc_pdf)
+                
+                # pdfkit.from_file(htmlPath,pdfPath)
+            else:
+                pass
         except :
             pass
         
