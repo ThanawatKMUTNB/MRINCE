@@ -1,3 +1,4 @@
+import csv
 from PyQt5 import QtWidgets, uic
 import sys
 import os
@@ -10,7 +11,7 @@ import PandasModel
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
-        uic.loadUi('MRINCE\GUI_Mrince.ui', self)
+        uic.loadUi('GUI_Mrince.ui', self)
         self.CSV1 = ""
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -38,7 +39,7 @@ class Ui(QtWidgets.QMainWindow):
                 file_name = os.path.basename(file_location)
                 # print(file_name)
                 newPath = file_location.replace(file_name, "Cleared_"+file_name)
-                self.df2.to_csv(newPath)
+                self.df2.to_csv(newPath, index=False)
                 # print(newPath)
                 
                 pdfPath = newPath.replace(".csv",".pdf")
