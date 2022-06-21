@@ -45,6 +45,9 @@ class Ui(QtWidgets.QMainWindow):
         
         self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
         
+        self.pushButton_8.clicked.connect(self.CustomerProduct) #7
+        
+        
         self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
         self.CustomerProductBT.clicked.connect(self.CustomerProduct)
         self.show()
@@ -84,10 +87,14 @@ class Ui(QtWidgets.QMainWindow):
             self.label_5.setText("Compleate")
             
     def CustomerProduct(self):#7
+        sdm = DataManager.dm()
+        
         if self.ExportByCustomerPath != "":
             self.label_6.setText("Waiting...")
-        
-        
+        # try:
+        sdm.Customer_product(self.ExportByCustomerTable)
+        # except :
+        #     pass
         if self.ExportByCustomerPath != "":
             self.label_6.setText("Compleate")
             

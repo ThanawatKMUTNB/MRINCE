@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
+import PIL.Image
 from barcode import EAN13
 from barcode.writer import ImageWriter
 import textwrap
@@ -94,7 +95,7 @@ class dm():
             i+=1
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('Barcode_Copy')
-        img = Image.open('Barcode_Copy.png')
+        img = PIL.Image.open('Barcode_Copy.png')
         return img
     
     def readbarcode(self,num):
@@ -274,8 +275,8 @@ class dm():
         except :
             pass
     
-    def Customer_product(self):     #7
-        newdf = self.ExportByCustomerTable
+    def Customer_product(self,newdf):     #7
+        # newdf = self.ExportByCustomerTable
         order_id = set(newdf['No.'].tolist())
         fonts = ImageFont.truetype(self.font, size=120)
         image_list = []
@@ -287,7 +288,7 @@ class dm():
             barcode_EOF = self.createbarcode("EOF").resize((int(width/3),int(height/9)))
             barcode_zero = self.createbarcode("0").resize((int(width/3),int(height/9)))
             customer_name = set(newdf.loc[newdf['No.']==order]['Customer Name'].tolist()).pop()
-            img = Image.new('RGB', (width, height), color='white')
+            img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             self.draw_multiple_line_text(img, f"No.  {str(order)}", fonts, text_color, height*(4/10))
             self.draw_multiple_line_text(img, customer_name, fonts, text_color, height*(5.5/10))
