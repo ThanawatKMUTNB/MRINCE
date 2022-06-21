@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
-from barcode import Code128, Code39
+from barcode import EAN13
 from barcode.writer import ImageWriter
 import textwrap
 import re
@@ -58,7 +58,9 @@ class dm():
         num_list = []
         for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
         str_to_num = "".join(num_list) + "".join(re.findall('[0-9]+',sku))
-        code = Code39(str_to_num,writer=ImageWriter())
+        while len(str_to_num) <13:
+            str_to_num = f"{str_to_num}0"
+        code = EAN13(str_to_num,writer=ImageWriter())
         code.save('Barcode_Copy')
         img = Image.open('Barcode_Copy.png')
         return img
