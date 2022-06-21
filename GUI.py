@@ -69,15 +69,21 @@ class Ui(QtWidgets.QMainWindow):
     def getParcelCover(self): #5
         sdm = DataManager.dm()
         try:
-            Max = int(self.lineEdit.toPlainText())
+            Max = int(self.lineEdit.text())
+            # print(int(self.lineEdit.text()),self.lineEdit.text())
             sdm.Cover(Max)
         except :
             pass
-        # print(int(self.textEdit.toPlainText()),self.textEdit.toPlainText())
-        # if self.textEdit.toPlainText() != "":
-        #     sdm.Durian_crate(self.ExportByProductTable)
+    
+    def ExportDupCSV(self): #6
+        if self.ExportByProductPath != "":
+            self.label_5.setText("Waiting...")
+        self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
+        DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
+        if self.ExportByProductPath != "":
+            self.label_5.setText("Compleate")
             
-    def CustomerProduct(self):
+    def CustomerProduct(self):#7
         if self.ExportByCustomerPath != "":
             self.label_6.setText("Waiting...")
         
@@ -113,14 +119,6 @@ class Ui(QtWidgets.QMainWindow):
             self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
         except :
             pass
-    
-    def ExportDupCSV(self):
-        if self.ExportByProductPath != "":
-            self.label_5.setText("Waiting...")
-        self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
-        DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
-        if self.ExportByProductPath != "":
-            self.label_5.setText("Compleate")
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
