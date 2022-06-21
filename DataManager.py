@@ -67,12 +67,23 @@ class dm():
         num_list = []
         for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
         str_to_num = "".join(num_list) + "".join(re.findall('[0-9]+',sku))
+        i=0
         while len(str_to_num) <13:
-            str_to_num = f"{str_to_num}0"
+            str_to_num = f"{str_to_num}{i}"
+            i+=1
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('Barcode_Copy')
         img = Image.open('Barcode_Copy.png')
         return img
+    
+    def readbarcode(self,num):
+        num = num[:-1]
+        while num[-1] != "0": num = num[:-1]
+        num = num[:-1]      #detect trash digits
+        chr_list = []
+        alpha = textwrap.wrap(num[:-4],2)       #split digit for character
+        for c in alpha: chr_list.append(str(chr(int(c))))   
+        return str("".join(chr_list)+num[-4:])
     
     def Barcode_Copy(self,df):     #1
         width = 400
