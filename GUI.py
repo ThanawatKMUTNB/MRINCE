@@ -1,4 +1,5 @@
 import csv
+from email.policy import strict
 from PyQt5 import QtWidgets, uic
 import sys
 import os
@@ -6,8 +7,7 @@ import DataManager
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 import PandasModel
-# import weasyprint
-import pdfkit
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -67,30 +67,10 @@ class Ui(QtWidgets.QMainWindow):
         self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
     
     def ExportDupCSV(self):
-        # try:
-            cols = list(self.ExportByProductTable.columns.values)
-            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
-                # self.ExportByCustomerTable
-                file_location = self.ExportByProductPath
-                # print(file_location)
-                file_name = os.path.basename(file_location)
-                # print(file_name)
-                newPath = file_location.replace(file_name, "Cleared_"+file_name)
-                self.label_5.setText(newPath)
-                self.ExportByProductTable.to_csv(newPath, index=False)
-                # print(newPath)
-                
-                pdfPath = newPath.replace(".csv",".pdf")
-                htmlPath = newPath.replace(".csv",".html")
-                
-                self.ExportByProductTable.to_html(htmlPath)
-                # config = pdfkit.configuration(wkhtmltopdf='C:\Program Files (x86)\wkhtmltopdf')
-                # pdfkit.from_file(newPath,pdfPath,configuration=config)
-                
-        #     else:
-        #         pass
-        # except :
-        #     pass
+        self.label_5.setText("Waiting...")
+        self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
+        DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
+        self.label_5.setText("Compleate")
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
