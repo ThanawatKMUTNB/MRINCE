@@ -1,12 +1,7 @@
 import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
-<<<<<<< HEAD
 from barcode import Code128, Code39
-=======
-# import barcode
-from barcode import Code128
->>>>>>> dce8769c91eb470d96a1f6d62b91d3dcef99c63a
 from barcode.writer import ImageWriter
 import textwrap
 import re
@@ -118,7 +113,7 @@ class dm():
         newdf = self.df.loc[~self.df['Product Categories'].isin(filter_values)]
         width = 400
         height = 250
-        fonts = ImageFont.truetype(font, size=20)
+        fonts = ImageFont.truetype(self.font, size=20)
         image_list = []
         for index, row in newdf.iterrows():
             product = row['Product Name']
