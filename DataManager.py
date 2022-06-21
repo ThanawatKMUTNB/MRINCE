@@ -54,6 +54,15 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
+    def createBarcodeSKU(sku):
+        str_to_num = str(sku)
+        while len(str_to_num) <13:
+            str_to_num = f"{str_to_num}0"
+        code = EAN13(str_to_num,writer=ImageWriter())
+        code.save('CustomerID')
+        img = Image.open('Phase1\src\CustomerID.png')
+        return img
+    
     def createbarcode(self,sku):
         num_list = []
         for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
@@ -65,12 +74,12 @@ class dm():
         img = Image.open('Barcode_Copy.png')
         return img
     
-    def Barcode_Copy(self):     #1
+    def Barcode_Copy(self,df):     #1
         width = 400
         height = 250
         fonts = ImageFont.truetype(self.font, size=20)
         image_list = []
-        for index, row in self.df.iterrows():
+        for index, row in df.iterrows():
             product = row['Product Name']
             product_name = product.split()[0]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
@@ -89,15 +98,15 @@ class dm():
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Barcode Copy Complete")
     
-    def Product_type(self):     #2
-        logo = Image.open("/Phase1/src/logo-web.png")
+    def Product_type(self,df):     #2
+        logo = Image.open(os.path.join("Phase1","src","logo-web.png"))
         width = 1240
         height = 1754
         head_font = ImageFont.truetype(self.font, size=160)
         content_1_font = ImageFont.truetype(self.font, size=100)
         content_2_font = ImageFont.truetype(self.font, size=60)
         image_list = []
-        for index, row in self.df.iterrows():
+        for index, row in df.iterrows():
             img = Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
             text_color = (0,0,0)
@@ -136,10 +145,10 @@ class dm():
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
     
-    def Durian_crate(self):     #4
+    def Durian_crate(self,df):     #4
         Durian_ID = [7576,7562,7564,8140,8216]    #กล่อง ,ลังเล็ก, ลังใหญ่, ก้านยาวกล่องเดี่ยว, ภูเขาไฟกล่องเดียว
         boxshare = [24,12]          #ลังใหญ่ ,ลังเล็ก
-        durianDF = self.df.loc[self.df['Product ID'].isin(Durian_ID)]
+        durianDF = df.loc[df['Product ID'].isin(Durian_ID)]
         sumbox = 0
         width = 1240
         height = 1754
@@ -188,31 +197,35 @@ class dm():
         print("Amount Complete")
     
     def ExportDupCSV(self,df,dfPath):
-        self.ExportByProductTable = df
-        self.ExportByProductPath = dfPath
-        cols = list(self.ExportByProductTable.columns.values)
-        if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
-            # self.ExportByCustomerTable
-            file_location = self.ExportByProductPath
-            # print(file_location)
-            file_name = os.path.basename(file_location)
-            # print(file_name)
-            newPath = file_location.replace(file_name, "Cleared_"+file_name)
-            # self.label_5.setText(newPath)
-            # self.ExportByProductTable.to_csv(newPath, index=False)
-            # print(newPath)
-            
-            pdfPath = newPath.replace(".csv",".pdf")
-            htmlPath = newPath.replace(".csv",".html")
-            mpl.font_manager.fontManager.addfont( os.path.join('Phase1','thsarabunnew-webfont.ttf'))
-            mpl.rc('font', family='TH Sarabun New')
+        try:
+            self.ExportByProductTable = df
+            self.ExportByProductPath = dfPath
+            cols = list(self.ExportByProductTable.columns.values)
+            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
+                # self.ExportByCustomerTable
+                file_location = self.ExportByProductPath
+                # print(file_location)
+                file_name = os.path.basename(file_location)
+                # print(file_name)
+                newPath = file_location.replace(file_name, "Cleared_"+file_name)
+                # self.label_5.setText(newPath)
+                # self.ExportByProductTable.to_csv(newPath, index=False)
+                # print(newPath)
+                
+                pdfPath = newPath.replace(".csv",".pdf")
+                htmlPath = newPath.replace(".csv",".html")
+                mpl.font_manager.fontManager.addfont( os.path.join('Phase1','src','thsarabunnew-webfont.ttf'))
+                mpl.rc('font', family='TH Sarabun New')
 
-            fig, ax = plt.subplots(figsize=(30,6))
-            ax.axis('tight')
-            ax.axis('off')
-            the_table = ax.table(cellText=self.ExportByProductTable.values,colLabels=self.ExportByProductTable.columns,loc='center')
-            the_table.set_fontsize(40)
-            the_table.scale(1,4)
-            pp = PdfPages(pdfPath)
-            pp.savefig(fig, bbox_inches='tight')
-            pp.close()
+                fig, ax = plt.subplots(figsize=(30,6))
+                ax.axis('tight')
+                ax.axis('off')
+                the_table = ax.table(cellText=self.ExportByProductTable.values,colLabels=self.ExportByProductTable.columns,loc='center')
+                the_table.set_fontsize(40)
+                the_table.scale(1,4)
+                pp = PdfPages(pdfPath)
+                pp.savefig(fig, bbox_inches='tight')
+                pp.close()
+        except :
+            pass
+        

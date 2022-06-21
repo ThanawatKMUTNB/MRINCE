@@ -28,49 +28,99 @@ class Ui(QtWidgets.QMainWindow):
         layout.addWidget(self.combo)
 
         self.ExportByProductButton = self.findChild(QtWidgets.QPushButton, 'pushButton')
-        # self.ExportByProductButton.clicked.connect(self.launchDialog)
         self.ExportByProductButton.clicked.connect(self.getPathExportByProduct)
         
         self.ExportByProductCustomer = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
-        # self.ExportByProductButton.clicked.connect(self.launchDialog)
         self.ExportByProductCustomer.clicked.connect(self.getPathExportByCustomer)
         
-        self.pushButton_9.clicked.connect(self.ExportDupCSV)
+        self.pushButton_3.clicked.connect(self.getBarcodeCopy) #1
         
+        self.pushButton_4.clicked.connect(self.getProductType) #2
+        
+        #3
+        
+        self.pushButton_6.clicked.connect(self.getDurianCrate) #4
+        
+        self.pushButton_7.clicked.connect(self.getParcelCover) #5
+        
+        self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
+        
+        self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
+        self.CustomerProductBT.clicked.connect(self.CustomerProduct)
         self.show()
     
+    def getBarcodeCopy(self): #1
+        sdm = DataManager.dm()
+        if self.ExportByProductPath != "":
+            sdm.Barcode_Copy(self.ExportByProductTable)
+    
+    def getProductType(self): #2
+        sdm = DataManager.dm()
+        if self.ExportByProductPath != "":
+            sdm.Product_type(self.ExportByProductTable)
+            
+    #3
+    
+    def getDurianCrate(self): #4
+        sdm = DataManager.dm()
+        if self.ExportByProductPath != "":
+            sdm.Durian_crate(self.ExportByProductTable)
+    
+    def getParcelCover(self): #5
+        sdm = DataManager.dm()
+        try:
+            Max = int(self.lineEdit.toPlainText())
+            sdm.Cover(Max)
+        except :
+            pass
+        # print(int(self.textEdit.toPlainText()),self.textEdit.toPlainText())
+        # if self.textEdit.toPlainText() != "":
+        #     sdm.Durian_crate(self.ExportByProductTable)
+            
+    def CustomerProduct(self):
+        if self.ExportByCustomerPath != "":
+            self.label_6.setText("Waiting...")
+        
+        
+        if self.ExportByCustomerPath != "":
+            self.label_6.setText("Compleate")
+            
     def getPathExportByProduct(self):
         sdm = DataManager.dm()
-        
-        self.ExportByProductPath = self.launchDialog()
-        self.label.setText(self.ExportByProductPath)
-        
-        sdm.setdf(self.ExportByProductPath)
-        
-        self.ExportByProductTable = sdm.sort()
-        model = PandasModel.PandasModel(self.ExportByProductTable)
-        self.tableView.setModel(model)
-        self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
-        print(type(self.ExportByProductTable))
+        try:
+            self.ExportByProductPath = self.launchDialog()
+            self.label.setText(self.ExportByProductPath)
+            sdm.setdf(self.ExportByProductPath)
+            
+            self.ExportByProductTable = sdm.sort()
+            model = PandasModel.PandasModel(self.ExportByProductTable)
+            self.tableView.setModel(model)
+            self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
+        except :
+            pass
         
     def getPathExportByCustomer(self):
         sdm = DataManager.dm()
-        
-        self.ExportByCustomerPath = self.launchDialog()
-        self.label_4.setText(self.ExportByCustomerPath)
-        
-        sdm.setdf(self.ExportByCustomerPath)
-        
-        self.ExportByCustomerTable = sdm.sort()
-        model = PandasModel.PandasModel(self.ExportByCustomerTable)
-        self.tableView_2.setModel(model)
-        self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
+        try:
+            self.ExportByCustomerPath = self.launchDialog()
+            self.label_4.setText(self.ExportByCustomerPath)
+            
+            sdm.setdf(self.ExportByCustomerPath)
+            
+            self.ExportByCustomerTable = sdm.sort()
+            model = PandasModel.PandasModel(self.ExportByCustomerTable)
+            self.tableView_2.setModel(model)
+            self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
+        except :
+            pass
     
     def ExportDupCSV(self):
-        self.label_5.setText("Waiting...")
+        if self.ExportByProductPath != "":
+            self.label_5.setText("Waiting...")
         self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
         DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
-        self.label_5.setText("Compleate")
+        if self.ExportByProductPath != "":
+            self.label_5.setText("Compleate")
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
