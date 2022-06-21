@@ -1,6 +1,6 @@
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
-from barcode import Code128
+from barcode import Code128, Code39
 from barcode.writer import ImageWriter
 import textwrap
 import re
@@ -37,9 +37,6 @@ class dm():
             return self.df
     
     def draw_multiple_line_text(self,image, text, font, text_color, text_start_height):
-        '''
-        From unutbu on [python PIL draw multiline text on image](https://stackoverflow.com/a/7698300/395857)
-        '''
         draw = ImageDraw.Draw(image)
         image_width, image_height = image.size
         y_text = text_start_height
@@ -50,28 +47,36 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
+    def createbarcode(self,sku):
+        num_list = []
+        for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
+        str_to_num = "".join(num_list) + "".join(re.findall('[0-9]+',sku))
+        code = Code39(str_to_num,writer=ImageWriter())
+        code.save('Barcode_Copy')
+        img = Image.open('Barcode_Copy.png')
+        return img
+    
     def Barcode_Copy(self):     #1
-        width = 500
-        height = 500
-        fonts = ImageFont.truetype(self.font, size=30)
+        width = 400
+        height = 250
+        fonts = ImageFont.truetype(self.font, size=20)
         image_list = []
-        for index, row in self.df.iterrows():
-            product_name = row['Product Name']
+        for index, row in df.iterrows():
+            product = row['Product Name']
+            product_name = product.split()[0]
+            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
             img = Image.new('RGB', (width, height), color='white')
             imgDraw = ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            text_start_height = 110
-            self.draw_multiple_line_text(img, product_name, fonts, text_color, text_start_height)
-            code = Code128(product_sku, writer=ImageWriter())
-            code.save("barcode")
-            code = Image.open("barcode.png")
-            code = code.resize((int(width/4),int(height/4)))
-            img.paste(code,(int(width/2),int(height/2.5)))
+            self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width/3),int(height/4)))
+            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
             subloop = int(row['Line Item Quantity'])
-            for copy in range(subloop):
-                image_list.append(img.convert('RGB'))
-
+            for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Barcode Copy Complete")
     
