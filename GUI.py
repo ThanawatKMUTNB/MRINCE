@@ -7,12 +7,17 @@ import pandas as pd
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 import PandasModel
 # import weasyprint
-# import pdfkit
+import pdfkit
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi('GUI_Mrince.ui', self)
-        self.CSV1 = ""
+        self.ExportByProductPath = ""
+        self.ExportByCustomerPath = ""
+        
+        self.ExportByProductTable = ""
+        self.ExportByCustomerTable = ""
+        
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -22,43 +27,76 @@ class Ui(QtWidgets.QMainWindow):
         self.combo.addItems(self.options)
         layout.addWidget(self.combo)
 
-        self.button = self.findChild(QtWidgets.QPushButton, 'pushButton') # Find the button
-        self.button.clicked.connect(self.launchDialog)
+        self.ExportByProductButton = self.findChild(QtWidgets.QPushButton, 'pushButton')
+        # self.ExportByProductButton.clicked.connect(self.launchDialog)
+        self.ExportByProductButton.clicked.connect(self.getPathExportByProduct)
+        
+        self.ExportByProductCustomer = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
+        # self.ExportByProductButton.clicked.connect(self.launchDialog)
+        self.ExportByProductCustomer.clicked.connect(self.getPathExportByCustomer)
         
         self.pushButton_9.clicked.connect(self.ExportDupCSV)
         
         self.show()
     
+    def getPathExportByProduct(self):
+        sdm = DataManager.dm()
+        
+        self.ExportByProductPath = self.launchDialog()
+        self.label.setText(self.ExportByProductPath)
+        
+        sdm.setdf(self.ExportByProductPath)
+        
+        self.ExportByProductTable = sdm.sort()
+        model = PandasModel.PandasModel(self.ExportByProductTable)
+        self.tableView.setModel(model)
+        self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
+        print(type(self.ExportByProductTable))
+        
+    def getPathExportByCustomer(self):
+        sdm = DataManager.dm()
+        
+        self.ExportByCustomerPath = self.launchDialog()
+        self.label_4.setText(self.ExportByCustomerPath)
+        
+        sdm.setdf(self.ExportByCustomerPath)
+        
+        self.ExportByCustomerTable = sdm.sort()
+        model = PandasModel.PandasModel(self.ExportByCustomerTable)
+        self.tableView_2.setModel(model)
+        self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
+    
     def ExportDupCSV(self):
-        try:
-            cols = list(self.df2.columns.values)
+        # try:
+            cols = list(self.ExportByProductTable.columns.values)
             if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
-                # self.df2
-                file_location = self.CSV1
+                # self.ExportByCustomerTable
+                file_location = self.ExportByProductPath
                 # print(file_location)
                 file_name = os.path.basename(file_location)
                 # print(file_name)
                 newPath = file_location.replace(file_name, "Cleared_"+file_name)
-                self.df2.to_csv(newPath, index=False)
+                self.label_5.setText(newPath)
+                self.ExportByProductTable.to_csv(newPath, index=False)
                 # print(newPath)
                 
                 pdfPath = newPath.replace(".csv",".pdf")
                 htmlPath = newPath.replace(".csv",".html")
                 
-                self.df2.to_html(htmlPath)
-                # doc_pdf = weasyprint.HTML(htmlPath).write_pdf()
-                # open(pdfPath, 'wb').write(doc_pdf)
+                self.ExportByProductTable.to_html(htmlPath)
+                # config = pdfkit.configuration(wkhtmltopdf='C:\Program Files (x86)\wkhtmltopdf')
+                # pdfkit.from_file(newPath,pdfPath,configuration=config)
                 
-                # pdfkit.from_file(htmlPath,pdfPath)
-            else:
-                pass
-        except :
-            pass
+        #     else:
+        #         pass
+        # except :
+        #     pass
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
         option = self.options.index(self.combo.currentText())
-        response = "Got Nothing Start"
+        
+        response = ''
         if option == 0:
             response = self.getFileName()
         elif option == 1:
@@ -71,21 +109,8 @@ class Ui(QtWidgets.QMainWindow):
             print('Got Nothing')
         
         if response != '' :
-            self.CSV1 = response
-            self.label.setText(self.CSV1)
-            
-            df = DataManager.dm(self.CSV1).sort()
-            model = PandasModel.PandasModel(df)
-            self.tableView.setModel(model)
-            self.label_2.setText("Count : "+str(len(df)))
-            
-            self.df2 = DataManager.dm(self.CSV1).dfSum()
-            model2 = PandasModel.PandasModel(self.df2)
-            self.tableView_2.setModel(model2)
-            self.label_3.setText("Count : "+str(len(self.df2)))
-            
-            # print("---------------------------",response)
-        
+            return response
+    
     def getFileName(self):  #1 file
         # file_filter = 'Excel File (*.xlsx *.csv *.xls)'
         file_filter = 'Excel File (*.csv)'
@@ -95,7 +120,7 @@ class Ui(QtWidgets.QMainWindow):
             caption='Select a data file',
             directory=os.getcwd(),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls *.csv)' #defult filter
+            initialFilter='Excel File (*.csv)' #defult filter
         )
         # print('\n#########################################\n')
         # print(response[0])
@@ -133,7 +158,7 @@ class Ui(QtWidgets.QMainWindow):
         )
         print(response)
         return response[0]
-
+    
         
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()

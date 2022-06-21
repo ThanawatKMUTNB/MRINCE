@@ -96,6 +96,11 @@
         <height>30</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <kerning>true</kerning>
+       </font>
+      </property>
       <property name="autoFillBackground">
        <bool>true</bool>
       </property>

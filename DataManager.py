@@ -1,21 +1,31 @@
+import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
+<<<<<<< HEAD
 from barcode import Code128, Code39
+=======
+# import barcode
+from barcode import Code128
+>>>>>>> dce8769c91eb470d96a1f6d62b91d3dcef99c63a
 from barcode.writer import ImageWriter
 import textwrap
 import re
-
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 
 class dm():
-    def __init__(self,direc):
-        self.df = pd.read_csv(direc)
+    def __init__(self):
         self.font = "Phase1/src/Kanit-Light.ttf"
+        
+    def setdf(self,path):
+        self.df = pd.read_csv(path)
+        
     def sort(self):
         try:
             self.df = self.df.sort_values(by=['Product ID'])
             return self.df
         except :
             return self.df
+        
     def dfSum(self):
         try:
             # print("------///")
@@ -61,13 +71,13 @@ class dm():
         height = 250
         fonts = ImageFont.truetype(self.font, size=20)
         image_list = []
-        for index, row in df.iterrows():
+        for index, row in self.df.iterrows():
             product = row['Product Name']
             product_name = product.split()[0]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
             img = Image.new('RGB', (width, height), color='white')
-            imgDraw = ImageDraw.Draw(img)       
+            ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
@@ -90,7 +100,7 @@ class dm():
         image_list = []
         for index, row in self.df.iterrows():
             img = Image.new('RGB', (width, height), color='white')
-            imgDraw = ImageDraw.Draw(img)
+            ImageDraw.Draw(img)
             text_color = (0,0,0)
             self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 400)
             self.draw_multiple_line_text(img, f"{re.findall('[0-9]+',row['Product Name'])[0]}  กรัม/แพ็ค", content_1_font, text_color, 700)
@@ -103,7 +113,29 @@ class dm():
         image_list[0].save('Product_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Product type Complete")
     
-    #3
+    def Product_label(self):    #3 filter veg and fruits
+        filter_values = ['ผัก','ผลไม้']
+        newdf = self.df.loc[~self.df['Product Categories'].isin(filter_values)]
+        width = 400
+        height = 250
+        fonts = ImageFont.truetype(font, size=20)
+        image_list = []
+        for index, row in newdf.iterrows():
+            product = row['Product Name']
+            product_name = product.split()[0]
+            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            product_sku = row['Product SKU']
+            img = Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)       
+            text_color = (0,0,0)   #black
+            self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width/3),int(height/4)))
+            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
+            subloop = int(row['Line Item Quantity'])
+            for copy in range(subloop): image_list.append(img.convert('RGB'))
     
     def Durian_crate(self):     #4
         Durian_ID = [7576,7562,7564,8140,8216]    #กล่อง ,ลังเล็ก, ลังใหญ่, ก้านยาวกล่องเดี่ยว, ภูเขาไฟกล่องเดียว
@@ -121,7 +153,7 @@ class dm():
                 'small':int((sumbox%boxshare[0])/boxshare[1]),
                 'single':int((sumbox%boxshare[0])%boxshare[1])}
         img = Image.new('RGB', (width, height), color='white')
-        imgDraw = ImageDraw.Draw(img)
+        ImageDraw.Draw(img)
         text_color = (0,0,0)
         text_start_height = height/5
         text = [f"กล่องเดี่ยวทั้งหมด  {sumbox}  กล่อง",
