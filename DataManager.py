@@ -189,8 +189,8 @@ class dm():
         width = 378
         height = 284
         image_list = []
-        font = ImageFont.truetype("Phase1/src/Kanit-Medium.ttf", size=90)
-        logo = Image.open("/Phase1/src/LogoBW.png")
+        font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
+        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
 
         for i in range(Max):
             num = str(i+1)
