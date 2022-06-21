@@ -145,75 +145,6 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Customer Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QPlainTextEdit" name="plainTextEdit_5">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3" colspan="2">
-        <widget class="QLabel" name="label_6">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Tracking Number</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="5">
         <widget class="QPlainTextEdit" name="plainTextEdit_15">
          <property name="minimumSize">
@@ -230,152 +161,8 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QLabel" name="label_5">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Customer Address</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPlainTextEdit" name="plainTextEdit_6">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3" colspan="2">
-        <widget class="QLabel" name="label_7">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Account No.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="5">
-        <widget class="QPlainTextEdit" name="plainTextEdit_16">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="label_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Customer Phone</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="2">
         <widget class="QPlainTextEdit" name="plainTextEdit_7">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3" colspan="2">
-        <widget class="QLabel" name="label_8">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Account Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="5">
-        <widget class="QPlainTextEdit" name="plainTextEdit_17">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -414,8 +201,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QPlainTextEdit" name="plainTextEdit_14">
+       <item row="1" column="5">
+        <widget class="QPlainTextEdit" name="plainTextEdit_16">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -430,8 +217,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="3" colspan="2">
-        <widget class="QLabel" name="label_9">
+       <item row="0" column="3" colspan="2">
+        <widget class="QLabel" name="label_6">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -450,17 +237,17 @@
           </font>
          </property>
          <property name="text">
-          <string>Shipping Option	</string>
+          <string>Tracking Number</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="5">
-        <widget class="QPlainTextEdit" name="plainTextEdit_18">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="maximumSize">
           <size>
@@ -468,38 +255,13 @@
            <height>30</height>
           </size>
          </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <widget class="QLabel" name="label">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Status</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="5">
-        <widget class="QPlainTextEdit" name="plainTextEdit_2">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+          <string>Customer Phone</string>
          </property>
         </widget>
        </item>
@@ -521,6 +283,27 @@
          </property>
          <property name="text">
           <string>Subtotal</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPlainTextEdit" name="plainTextEdit_5">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
          </property>
         </widget>
        </item>
@@ -566,6 +349,30 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLabel" name="label_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Customer Address</string>
+         </property>
+        </widget>
+       </item>
        <item row="5" column="4" colspan="2">
         <widget class="QPlainTextEdit" name="plainTextEdit_3">
          <property name="minimumSize">
@@ -587,119 +394,229 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Customer Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" colspan="2">
+        <widget class="QLabel" name="label_7">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Account No.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" colspan="2">
+        <widget class="QLabel" name="label_9">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Shipping Option	</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" colspan="2">
+        <widget class="QLabel" name="label_8">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Account Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <widget class="QPlainTextEdit" name="plainTextEdit_18">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Status</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QPlainTextEdit" name="plainTextEdit_14">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="5">
+        <widget class="QPlainTextEdit" name="plainTextEdit_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPlainTextEdit" name="plainTextEdit_6">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <widget class="QPlainTextEdit" name="plainTextEdit_17">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
     <item row="3" column="0" colspan="3">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Purchase Order</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListView" name="listView"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_13">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>จำนวนที่สั่ง</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListView" name="listView_2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLabel" name="label_14">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>จำนวนที่ได้</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListView" name="listView_3">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <widget class="QTableWidget" name="tableWidget">
+      <attribute name="horizontalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>สินค้า</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>จำนวนที่สั่ง</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>จำนวนที่ได้</string>
+       </property>
+      </column>
+     </widget>
     </item>
    </layout>
   </widget>
