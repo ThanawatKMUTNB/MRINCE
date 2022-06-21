@@ -1,21 +1,27 @@
+import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
+# import barcode
 from barcode import Code128
 from barcode.writer import ImageWriter
 import textwrap
 import re
-
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
 
 class dm():
-    def __init__(self,direc):
-        self.df = pd.read_csv(direc)
+    def __init__(self):
         self.font = "Phase1/src/Kanit-Light.ttf"
+        
+    def setdf(self,path):
+        self.df = pd.read_csv(path)
+        
     def sort(self):
         try:
             self.df = self.df.sort_values(by=['Product ID'])
             return self.df
         except :
             return self.df
+        
     def dfSum(self):
         try:
             # print("------///")
