@@ -9,6 +9,14 @@ from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFile
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, inch
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import PageBreak
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 class dm():
     def __init__(self):
         self.font = "Phase1/src/Kanit-Light.ttf"
@@ -222,8 +230,31 @@ class dm():
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
     
-    def ExportDupCSV(self,df,dfPath):
-        try:
+    # def splitPageByProduct(self,df,pdfPath):
+    #     col_one_list = list(set(df['Product Categories'].tolist()))
+    #     elements = []
+    #     for i in col_one_list:
+    #         print(i)
+    #         rslt_df = df.loc[df['Product Categories'] == i]
+    #         rslt_df = rslt_df.sort_values(by=['Product ID'])
+    #         ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
+    #         doc = SimpleDocTemplate(pdfPath, pagesize=A4)
+    #         # styleSheet = getSampleStyleSheet()
+    #         data = ListOfList
+    #         t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+    #                              ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+    #                              # ('SPAN', (0,0), (4,0))
+    #                              ])
+            
+    #         elements.append(t)
+    #         elements.append(PageBreak())
+    #     doc.build(elements) 
+            
+    #         # print(ListOfList)
+    #         # print("--------------------------")
+    
+    def ExportDupCSV(self,df,dfPath): #6
+        # try:
             self.ExportByProductTable = df
             self.ExportByProductPath = dfPath
             cols = list(self.ExportByProductTable.columns.values)
@@ -239,19 +270,29 @@ class dm():
                 # print(newPath)
                 
                 pdfPath = newPath.replace(".csv",".pdf")
-                htmlPath = newPath.replace(".csv",".html")
-                mpl.font_manager.fontManager.addfont( os.path.join('Phase1','src','thsarabunnew-webfont.ttf'))
-                mpl.rc('font', family='TH Sarabun New')
-
-                fig, ax = plt.subplots(figsize=(30,6))
-                ax.axis('tight')
-                ax.axis('off')
-                the_table = ax.table(cellText=self.ExportByProductTable.values,colLabels=self.ExportByProductTable.columns,loc='center')
-                the_table.set_fontsize(40)
-                the_table.scale(1,4)
-                pp = PdfPages(pdfPath)
-                pp.savefig(fig, bbox_inches='tight')
-                pp.close()
-        except :
-            pass
+                col_one_list = list(set(df['Product Categories'].tolist()))
+                elements = []
+                for i in col_one_list:
+                    print(i)
+                    rslt_df = df.loc[df['Product Categories'] == i]
+                    rslt_df = rslt_df.sort_values(by=['Product ID'])
+                    ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
+                    # doc = SimpleDocTemplate(pdfPath, pagesize=A4)
+                    doc = SimpleDocTemplate(pdfPath,pagesize=A4,
+                        rightMargin=18,leftMargin=18,
+                        topMargin=18,bottomMargin=18)
+                    # styleSheet = getSampleStyleSheet()
+                    data = ListOfList
+                    pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+                    t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('FONTSIZE', (0,0), (-1,-1),14)
+                                        ])
+                    
+                    elements.append(t)
+                    elements.append(PageBreak())
+                doc.build(elements) 
+        # except :
+        #     pass
         
