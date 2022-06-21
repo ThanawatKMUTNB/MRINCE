@@ -1,9 +1,7 @@
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QFileDialog
 import pandas as pd
-import numpy as np
 
-from functools import partial
 import sys
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
@@ -11,20 +9,29 @@ class Ui(QtWidgets.QMainWindow):
         uic.loadUi('GUI_Mrince_7.ui', self)
 
         # button
-        self.button = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
-        self.button.clicked.connect(self.load_file)
-        self.ok = self.findChild(QtWidgets.QPushButton, 'pushButton_3')
-        self.ok.clicked.connect(self.show_customer_info)
+        self.select_file_button = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
+        self.select_file_button.clicked.connect(self.load_file)
+        self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton')
+        self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton_4')
+        self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton_5')
 
         # Label
-        self.Cus_ID = self.findChild(QtWidgets.QPlainTextEdit, 'plainTextEdit')
-        self.Cus_name = self.findChild(QtWidgets.QPlainTextEdit, 'plainTextEdit_5')
+        self.status = self.findChild(QtWidgets.QLabel, 'label_4')
+        self.status.setText('สถานะ : ไม่พร้อม')
+        self.customer_name = self.findChild(QtWidgets.QLabel, 'label_3')
+        self.file_name_label = self.findChild(QtWidgets.QLabel, 'label_5')
+
+        # Line Edit
+        self.cus_ID = self.findChild(QtWidgets.QLineEdit, 'lineEdit')
+        self.cus_ID.returnPressed.connect(self.show_customer_info)
+        self.item_ID = self.findChild(QtWidgets.QLineEdit, 'lineEdit_3')
 
         # table
         self.table = self.findChild(QtWidgets.QTableWidget, 'tableWidget')
         self.table.setColumnCount(3)
 
         self.ID = None
+        self.add_mode = True
         self.csv = pd.DataFrame()
         self.order_list = pd.DataFrame()
         self.show()
@@ -36,12 +43,14 @@ class Ui(QtWidgets.QMainWindow):
         if fileName:
             # load csv
             self.csv = pd.read_csv(fileName)
+            self.file_name_label.setText(fileName)
+            self.status.setText('สถานะ : พร้อม')
     
     def show_customer_info(self) -> None:
         if self.csv.empty:
             return
         
-        self.ID = self.Cus_ID.toPlainText()
+        self.ID = self.cus_ID.text()
         if self.ID.isnumeric():
             self.ID = int(self.ID)
         else:
@@ -49,9 +58,9 @@ class Ui(QtWidgets.QMainWindow):
         if self.ID in self.csv['No.'].unique():
             info = self.csv.loc[self.csv['No.'] == self.ID].iloc[0]
             # clear old text
-            self.Cus_name.clear()
+            self.customer_name.clear()
             # set new text
-            self.Cus_name.insertPlainText(info['Customer Name'])
+            self.customer_name.setText(info['Customer Name'])
             self.show_item_list()
             
     def show_item_list(self) -> None:
