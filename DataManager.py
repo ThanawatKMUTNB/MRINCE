@@ -90,6 +90,7 @@ class dm():
         return img
     
     def readbarcode(self,num):
+        if num == "6979700123456":return "EOF"  #End of file
         num = num[:-1]
         while num[-1] != "0": num = num[:-1]
         num = num[:-1]      #detect trash digits
@@ -222,7 +223,7 @@ class dm():
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
     
-    def ExportDupCSV(self,df,dfPath):
+    def ExportDupCSV(self,df,dfPath):   #6
         try:
             self.ExportByProductTable = df
             self.ExportByProductPath = dfPath
@@ -254,4 +255,28 @@ class dm():
                 pp.close()
         except :
             pass
+    
+    def Customer_product(self):     #7
+        newdf = self.ExportByCustomerTable
+        order_id = set(newdf['No.'].tolist())
+        fonts = ImageFont.truetype(self.font, size=120)
+        image_list = []
+        text_color = (0,0,0)   #black
+        width = 1240 
+        height = 1754 
+        for order in order_id:
+            barcode_order = self.createbarcode(str(order)).resize((int(width/1.5),int(height/7)))
+            barcode_EOF = self.createbarcode("EOF").resize((int(width/3),int(height/9)))
+            barcode_zero = self.createbarcode("0").resize((int(width/3),int(height/9)))
+            customer_name = set(newdf.loc[newdf['No.']==order]['Customer Name'].tolist()).pop()
+            img = Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)       
+            self.draw_multiple_line_text(img, f"No.  {str(order)}", fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text(img, customer_name, fonts, text_color, height*(5.5/10))
+            img.paste(barcode_order,(int(width*(1/6)),int(height*(2/10))))
+            img.paste(barcode_EOF,(int(width*(1/6)),int(height*(8/10))))
+            img.paste(barcode_zero,(int(width*(3/6)),int(height*(8/10))))
+            image_list.append(img.convert('RGB'))
+        image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
+        print('Customer page complete')
         
