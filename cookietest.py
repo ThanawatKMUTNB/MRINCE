@@ -1,3 +1,10 @@
+from pip.operations import freeze  
+
+modules = list(
+    map(lambda x: x.split('=='), freeze.freeze(local_only=True))
+)
+
+###########################################3
 # import pandas as pd
 # import DataManager
 

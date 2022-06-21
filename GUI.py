@@ -83,6 +83,7 @@ class Ui(QtWidgets.QMainWindow):
             self.label_5.setText("Waiting...")
         self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
         DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
+        print("Compleate")
         if self.ExportByProductPath != "":
             self.label_5.setText("Compleate")
             

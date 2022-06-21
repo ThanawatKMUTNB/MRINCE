@@ -250,7 +250,10 @@ class dm():
                 
                 pdfPath = newPath.replace(".csv",".pdf")
                 col_one_list = list(set(df['Product Categories'].tolist()))
+                # print(col_one_list)
+                # col_one_list = col_one_list.sort()1
                 elements = []
+                # print(col_one_list)
                 for i in col_one_list:
                     print(i)
                     rslt_df = df.loc[df['Product Categories'] == i]
