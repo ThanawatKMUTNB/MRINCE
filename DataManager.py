@@ -54,6 +54,17 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
+    def draw_multiple_line_text_barcode(self,image, text, font, text_color, text_start_height):
+        draw = ImageDraw.Draw(image)
+        image_width, image_height = image.size
+        y_text = text_start_height
+        lines = textwrap.wrap(text, width=40)
+        for line in lines:
+            line_width, line_height = font.getsize(line)
+            draw.text(((image_width - line_width) / 1.3, y_text), 
+                    line, font=font, fill=text_color)
+            y_text += line_height
+
     def createBarcodeSKU(sku):
         str_to_num = str(sku)
         while len(str_to_num) <13:
@@ -65,7 +76,9 @@ class dm():
     
     def createbarcode(self,sku):
         num_list = []
-        for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
+        try:
+            for c in re.findall('[a-zA-Z]+',sku)[0]: num_list.append(str(ord(c)))
+        except:pass
         str_to_num = "".join(num_list) + "".join(re.findall('[0-9]+',sku))
         i=0
         while len(str_to_num) <13:
@@ -87,22 +100,24 @@ class dm():
     
     def Barcode_Copy(self,df):     #1
         width = 400
-        height = 250
+        height = 300
         fonts = ImageFont.truetype(self.font, size=20)
+        fonts_weight = ImageFont.truetype(self.font, size=15)
+        fonts_sku = ImageFont.truetype(self.font, size=20)
         image_list = []
         for index, row in df.iterrows():
             product = row['Product Name']
-            product_name = product.split()[0]
+            product_name = product.split('(')[0]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
             img = Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
-            self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
-            code = code.resize((int(width/3),int(height/4)))
+            code = code.resize((int(width/2),int(height/4)))
             img.paste(code,(int(width*(1/3)),int(height*(1/2))))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
@@ -135,26 +150,26 @@ class dm():
     def Product_label(self):    #3 filter veg and fruits
         filter_values = ['ผัก','ผลไม้']
         newdf = self.df.loc[~self.df['Product Categories'].isin(filter_values)]
-        width = 400
-        height = 250
-        fonts = ImageFont.truetype(self.font, size=20)
-        image_list = []
-        for index, row in newdf.iterrows():
-            product = row['Product Name']
-            product_name = product.split()[0]
-            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
-            product_sku = row['Product SKU']
-            img = Image.new('RGB', (width, height), color='white')
-            ImageDraw.Draw(img)       
-            text_color = (0,0,0)   #black
-            self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
-            self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
-            code = self.createbarcode(product_sku)
-            code = code.resize((int(width/3),int(height/4)))
-            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
-            subloop = int(row['Line Item Quantity'])
-            for copy in range(subloop): image_list.append(img.convert('RGB'))
+        # width = 400
+        # height = 250
+        # fonts = ImageFont.truetype(self.font, size=20)
+        # image_list = []
+        # for index, row in newdf.iterrows():
+        #     product = row['Product Name']
+        #     product_name = product.split('(')[0]
+        #     product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+        #     product_sku = row['Product SKU']
+        #     img = Image.new('RGB', (width, height), color='white')
+        #     ImageDraw.Draw(img)       
+        #     text_color = (0,0,0)   #black
+        #     self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
+        #     self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
+        #     self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
+        #     code = self.createbarcode(product_sku)
+        #     code = code.resize((int(width/3),int(height/4)))
+        #     img.paste(code,(int(width*(1/3)),int(height*(1/2))))
+        #     subloop = int(row['Line Item Quantity'])
+        #     for copy in range(subloop): image_list.append(img.convert('RGB'))
     
     def Durian_crate(self,df):     #4
         Durian_ID = [7576,7562,7564,8140,8216]    #กล่อง ,ลังเล็ก, ลังใหญ่, ก้านยาวกล่องเดี่ยว, ภูเขาไฟกล่องเดียว
@@ -186,8 +201,8 @@ class dm():
         print("Calculate Durians Complete")
     
     def Cover(self,Max):        #5
-        width = 378
-        height = 284
+        width = 4*100
+        height = 4*75
         image_list = []
         font = ImageFont.truetype("Phase1/src/Kanit-Medium.ttf", size=90)
         logo = Image.open("/Phase1/src/LogoBW.png")
