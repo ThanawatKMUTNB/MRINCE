@@ -98,6 +98,7 @@ class dm():
         return img
     
     def readbarcode(self,num):
+        if num == "6979700123456":return "EOF"  #End of file
         num = num[:-1]
         while num[-1] != "0": num = num[:-1]
         num = num[:-1]      #detect trash digits
@@ -230,31 +231,8 @@ class dm():
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
     
-    # def splitPageByProduct(self,df,pdfPath):
-    #     col_one_list = list(set(df['Product Categories'].tolist()))
-    #     elements = []
-    #     for i in col_one_list:
-    #         print(i)
-    #         rslt_df = df.loc[df['Product Categories'] == i]
-    #         rslt_df = rslt_df.sort_values(by=['Product ID'])
-    #         ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
-    #         doc = SimpleDocTemplate(pdfPath, pagesize=A4)
-    #         # styleSheet = getSampleStyleSheet()
-    #         data = ListOfList
-    #         t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #                              ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-    #                              # ('SPAN', (0,0), (4,0))
-    #                              ])
-            
-    #         elements.append(t)
-    #         elements.append(PageBreak())
-    #     doc.build(elements) 
-            
-    #         # print(ListOfList)
-    #         # print("--------------------------")
-    
-    def ExportDupCSV(self,df,dfPath): #6
-        # try:
+    def ExportDupCSV(self,df,dfPath):   #6
+        try:
             self.ExportByProductTable = df
             self.ExportByProductPath = dfPath
             cols = list(self.ExportByProductTable.columns.values)
@@ -293,6 +271,30 @@ class dm():
                     elements.append(t)
                     elements.append(PageBreak())
                 doc.build(elements) 
-        # except :
-        #     pass
+        except :
+            pass
+    
+    def Customer_product(self):     #7
+        newdf = self.ExportByCustomerTable
+        order_id = set(newdf['No.'].tolist())
+        fonts = ImageFont.truetype(self.font, size=120)
+        image_list = []
+        text_color = (0,0,0)   #black
+        width = 1240 
+        height = 1754 
+        for order in order_id:
+            barcode_order = self.createbarcode(str(order)).resize((int(width/1.5),int(height/7)))
+            barcode_EOF = self.createbarcode("EOF").resize((int(width/3),int(height/9)))
+            barcode_zero = self.createbarcode("0").resize((int(width/3),int(height/9)))
+            customer_name = set(newdf.loc[newdf['No.']==order]['Customer Name'].tolist()).pop()
+            img = Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)       
+            self.draw_multiple_line_text(img, f"No.  {str(order)}", fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text(img, customer_name, fonts, text_color, height*(5.5/10))
+            img.paste(barcode_order,(int(width*(1/6)),int(height*(2/10))))
+            img.paste(barcode_EOF,(int(width*(1/6)),int(height*(8/10))))
+            img.paste(barcode_zero,(int(width*(3/6)),int(height*(8/10))))
+            image_list.append(img.convert('RGB'))
+        image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
+        print('Customer page complete')
         
