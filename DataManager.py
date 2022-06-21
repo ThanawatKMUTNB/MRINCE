@@ -6,7 +6,9 @@ from barcode.writer import ImageWriter
 import textwrap
 import re
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib as mpl
 class dm():
     def __init__(self):
         self.font = "Phase1/src/Kanit-Light.ttf"
@@ -21,25 +23,25 @@ class dm():
         except :
             return self.df
         
-    def dfSum(self):
+    def dfSum(df):
         try:
             # print("------///")
             # cols = list(self.df.columns.values)
             # print(cols)
-            self.df1 = self.df.sort_values(by=['Product ID'])
-            self.df1 = self.df1.drop(['Line Item Quantity'], axis=1)
-            self.df1 = self.df1.drop_duplicates()
+            df1 = df.sort_values(by=['Product ID'])
+            df1 = df1.drop(['Line Item Quantity'], axis=1)
+            df1 = df1.drop_duplicates()
             # print(len(self.df1))
-            self.df2 = self.df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
+            df2 = df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
             # print(len(self.df2))
             
             # print("------///")
-            self.dfsum = pd.merge(self.df1,self.df2) 
-            self.dfsum = self.dfsum[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
+            dfsum = pd.merge(df1,df2) 
+            dfsum = dfsum[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
             
-            return self.dfsum
+            return dfsum
         except :
-            return self.df
+            return df
     
     def draw_multiple_line_text(self,image, text, font, text_color, text_start_height):
         draw = ImageDraw.Draw(image)
@@ -182,3 +184,33 @@ class dm():
             image_list.append(img.convert('RGB'))
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
+    
+    def ExportDupCSV(self,df,dfPath):
+        self.ExportByProductTable = df
+        self.ExportByProductPath = dfPath
+        cols = list(self.ExportByProductTable.columns.values)
+        if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
+            # self.ExportByCustomerTable
+            file_location = self.ExportByProductPath
+            # print(file_location)
+            file_name = os.path.basename(file_location)
+            # print(file_name)
+            newPath = file_location.replace(file_name, "Cleared_"+file_name)
+            # self.label_5.setText(newPath)
+            # self.ExportByProductTable.to_csv(newPath, index=False)
+            # print(newPath)
+            
+            pdfPath = newPath.replace(".csv",".pdf")
+            htmlPath = newPath.replace(".csv",".html")
+            mpl.font_manager.fontManager.addfont( os.path.join('Phase1','thsarabunnew-webfont.ttf'))
+            mpl.rc('font', family='TH Sarabun New')
+
+            fig, ax = plt.subplots(figsize=(30,6))
+            ax.axis('tight')
+            ax.axis('off')
+            the_table = ax.table(cellText=self.ExportByProductTable.values,colLabels=self.ExportByProductTable.columns,loc='center')
+            the_table.set_fontsize(40)
+            the_table.scale(1,4)
+            pp = PdfPages(pdfPath)
+            pp.savefig(fig, bbox_inches='tight')
+            pp.close()
