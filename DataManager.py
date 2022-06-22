@@ -80,7 +80,7 @@ class dm():
             str_to_num = f"{str_to_num}0"
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('CustomerID')
-        img =  PIL.Image.open('Phase1\src\CustomerID.png')
+        img =  Image.open('Phase1\src\CustomerID.png')
         return img
     
     def createbarcode(self,sku):
@@ -136,7 +136,7 @@ class dm():
         print("Barcode Copy Complete")
     
     def Product_type(self,df):     #2
-        logo =  PIL.Image.open(os.path.join("Phase1","src","logo-web.png"))
+        logo =  Image.open(os.path.join("Phase1","src","logo-web.png"))
         width = 1240
         height = 1754
         head_font = ImageFont.truetype(self.font, size=160)
