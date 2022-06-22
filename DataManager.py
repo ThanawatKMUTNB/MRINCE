@@ -120,7 +120,7 @@ class dm():
             product_name = product.split('(')[0]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
-            img = Image.new('RGB', (width, height), color='white')
+            img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
@@ -143,7 +143,7 @@ class dm():
         content_2_font = ImageFont.truetype(self.font, size=60)
         image_list = []
         for index, row in df.iterrows():
-            img = Image.new('RGB', (width, height), color='white')
+            img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
             text_color = (0,0,0)
             self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 400)
@@ -169,7 +169,7 @@ class dm():
         #     product_name = product.split('(')[0]
         #     product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
         #     product_sku = row['Product SKU']
-        #     img = Image.new('RGB', (width, height), color='white')
+        #     img = PIL.Image.new('RGB', (width, height), color='white')
         #     ImageDraw.Draw(img)       
         #     text_color = (0,0,0)   #black
         #     self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
@@ -196,7 +196,7 @@ class dm():
         box = { 'big':int(sumbox/boxshare[0]),
                 'small':int((sumbox%boxshare[0])/boxshare[1]),
                 'single':int((sumbox%boxshare[0])%boxshare[1])}
-        img = Image.new('RGB', (width, height), color='white')
+        img = PIL.Image.new('RGB', (width, height), color='white')
         ImageDraw.Draw(img)
         text_color = (0,0,0)
         text_start_height = height/5
@@ -221,7 +221,7 @@ class dm():
             num = str(i+1)
             while len(num)<3:
                 num = f"0{num}"
-            img = Image.new('RGB', (width, height), color='white')
+            img = PIL.Image.new('RGB', (width, height), color='white')
             imgDraw = ImageDraw.Draw(img)
             textWidth, textHeight = imgDraw.textsize(num, font=font)
             xText = (width - textWidth) / 2
