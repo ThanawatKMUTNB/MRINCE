@@ -12,7 +12,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, inch
-from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Table
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import PageBreak
 from reportlab.lib.pagesizes import A4
@@ -80,7 +80,7 @@ class dm():
             str_to_num = f"{str_to_num}0"
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('CustomerID')
-        img = Image.open('Phase1\src\CustomerID.png')
+        img =  PIL.Image.open('Phase1\src\CustomerID.png')
         return img
     
     def createbarcode(self,sku):
@@ -135,7 +135,7 @@ class dm():
         print("Barcode Copy Complete")
     
     def Product_type(self,df):     #2
-        logo = Image.open(os.path.join("Phase1","src","logo-web.png"))
+        logo =  PIL.Image.open(os.path.join("Phase1","src","logo-web.png"))
         width = 1240
         height = 1754
         head_font = ImageFont.truetype(self.font, size=160)
@@ -215,7 +215,7 @@ class dm():
         height = 4*75
         image_list = []
         font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
-        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        logo =  PIL.Image.open(os.path.join("Phase1","src","LogoBW.png"))
 
         for i in range(Max):
             num = str(i+1)
