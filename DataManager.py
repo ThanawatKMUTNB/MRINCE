@@ -33,24 +33,32 @@ class dm():
             return self.df
         
     def dfSum(df):
-        try:
+        # try:
             # print("------///")
-            # cols = list(self.df.columns.values)
+            cols = list(df.columns.values)
             # print(cols)
-            df1 = df.sort_values(by=['Product ID'])
-            df1 = df1.drop(['Line Item Quantity'], axis=1)
-            df1 = df1.drop_duplicates()
-            # print(len(self.df1))
-            df2 = df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
-            # print(len(self.df2))
+            df = df[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
             
+            df1 = df.sort_values(by=['Product Name','Product ID'])
+            # df1 = df.sort_values(by=['Product Name'])
+            # print(len(df1))
+            # print(df1)
+            df1 = df1.drop(['Line Item Quantity'], axis=1)
+            # print(len(df1))
+            df1 = df1.drop_duplicates()
+            # print(len(df1))
+            # print(df1['Product ID'])
+            df2 = df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
+            # print(len(df2))
+            # print(df2)
             # print("------///")
             dfsum = pd.merge(df1,df2) 
             dfsum = dfsum[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
-            
+            # cols = list(dfsum.columns.values)
+            # print(cols)
             return dfsum
-        except :
-            return df
+        # except :
+        #     return df
     
     def draw_multiple_line_text(self,image, text, font, text_color, text_start_height):
         draw = ImageDraw.Draw(image)
