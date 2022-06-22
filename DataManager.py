@@ -137,22 +137,22 @@ class dm():
     
     def Product_type(self,df):     #2
         logo =  Image.open(os.path.join("Phase1","src","logo-web.png"))
-        width = 1240
-        height = 1754
-        head_font = ImageFont.truetype(self.font, size=160)
-        content_1_font = ImageFont.truetype(self.font, size=100)
-        content_2_font = ImageFont.truetype(self.font, size=60)
+        width = int(1240/2)
+        height = int(1754/2)
+        head_font = ImageFont.truetype(self.font, size=80)
+        content_1_font = ImageFont.truetype(self.font, size=50)
+        content_2_font = ImageFont.truetype(self.font, size=30)
         image_list = []
         for index, row in df.iterrows():
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
             text_color = (0,0,0)
-            self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 400)
-            self.draw_multiple_line_text(img, f"{re.findall('[0-9]+',row['Product Name'])[0]}  กรัม/แพ็ค", content_1_font, text_color, 700)
-            self.draw_multiple_line_text(img, f"{row['Product Name']}     {row['Product Categories']}", content_2_font, text_color, 1000)
-            self.draw_multiple_line_text(img, str(row['Line Item Quantity']), head_font, text_color, 1200)
-            self.draw_multiple_line_text(img, "แพ็ค", content_1_font, text_color, 1400)
-            img.paste(logo,(int(width/2.4),200))
+            self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 200)
+            self.draw_multiple_line_text(img, f"{re.findall('[0-9]+',row['Product Name'])[0]}  กรัม/แพ็ค", content_1_font, text_color, 350)
+            self.draw_multiple_line_text(img, f"{row['Product Name']}     {row['Product Categories']}", content_2_font, text_color, 500)
+            self.draw_multiple_line_text(img, str(row['Line Item Quantity']), head_font, text_color, 600)
+            self.draw_multiple_line_text(img, "แพ็ค", content_1_font, text_color, 700)
+            img.paste(logo,(int(width/3.3),20))
             image_list.append(img.convert('RGB'))
 
         image_list[0].save('Product_pages.pdf', save_all=True, append_images=image_list[1:])
