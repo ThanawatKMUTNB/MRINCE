@@ -33,24 +33,32 @@ class dm():
             return self.df
         
     def dfSum(df):
-        try:
+        # try:
             # print("------///")
-            # cols = list(self.df.columns.values)
+            cols = list(df.columns.values)
             # print(cols)
-            df1 = df.sort_values(by=['Product ID'])
-            df1 = df1.drop(['Line Item Quantity'], axis=1)
-            df1 = df1.drop_duplicates()
-            # print(len(self.df1))
-            df2 = df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
-            # print(len(self.df2))
+            df = df[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
             
+            df1 = df.sort_values(by=['Product Name','Product ID'])
+            # df1 = df.sort_values(by=['Product Name'])
+            # print(len(df1))
+            # print(df1)
+            df1 = df1.drop(['Line Item Quantity'], axis=1)
+            # print(len(df1))
+            df1 = df1.drop_duplicates()
+            # print(len(df1))
+            # print(df1['Product ID'])
+            df2 = df.groupby(['Product ID'], as_index=False)['Line Item Quantity'].sum()
+            # print(len(df2))
+            # print(df2)
             # print("------///")
             dfsum = pd.merge(df1,df2) 
             dfsum = dfsum[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
-            
+            # cols = list(dfsum.columns.values)
+            # print(cols)
             return dfsum
-        except :
-            return df
+        # except :
+        #     return df
     
     def draw_multiple_line_text(self,image, text, font, text_color, text_start_height):
         draw = ImageDraw.Draw(image)
@@ -232,6 +240,28 @@ class dm():
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
     
+    def Cover_3Copy(self,Max):
+        width = 4*100
+        height = 4*75
+        image_list = []
+        font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
+        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        for i in range(int(Max)):
+            num = str(i+1)
+            while len(num)<3:
+                num = f"0{num}"
+            img = PIL.Image.new('RGB', (width, height), color='white')
+            imgDraw = ImageDraw.Draw(img)
+            textWidth, textHeight = imgDraw.textsize(num, font=font)
+            xText = (width - textWidth) / 2
+            yText = (height - textHeight) / 2
+            for i in range(3):
+                imgDraw.text((xText, yText), num, font=font, fill=(0, 0, 0))
+                img.paste(logo,(int(width/2.7),50))
+                image_list.append(img.convert('RGB'))
+        image_list[0].save('Amount3Copy_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("Amount Complete")
+    
     def ExportDupCSV(self,df,dfPath):   #6
         try:
             self.ExportByProductTable = df
@@ -301,3 +331,5 @@ class dm():
             image_list.append(img.convert('RGB'))
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
+    
+    

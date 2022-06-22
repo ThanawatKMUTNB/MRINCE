@@ -1,15 +1,20 @@
-from pip.operations import freeze  
+# from pip.operations import freeze  
 
-modules = list(
-    map(lambda x: x.split('=='), freeze.freeze(local_only=True))
-)
+# modules = list(
+#     map(lambda x: x.split('=='), freeze.freeze(local_only=True))
+# )
 
 ###########################################3
-# import pandas as pd
-# import DataManager
+import pandas as pd
+import DataManager
 
 # df = pd.read_csv('Phase1\Order_Items_Export_-_2022-06-20.csv')
 # DataManager.dm.splitPageByProduct(DataManager.dm,df)
+
+df = pd.read_csv('L70_export_by_product.csv')
+# x = DataManager.dm.dfSum(df)
+print(df.loc[df['Product Name']=='ปังสังขยา ตรา ชฎา (300 กรัม)'])
+# print(len(x))
 #######################3
 
 # from reportlab.lib import colors
