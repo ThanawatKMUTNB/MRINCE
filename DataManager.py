@@ -70,7 +70,7 @@ class dm():
         lines = textwrap.wrap(text, width=40)
         for line in lines:
             line_width, line_height = font.getsize(line)
-            draw.text(((image_width - line_width) / 5, y_text), 
+            draw.text(((image_width - line_width) / 1.3, y_text), 
                     line, font=font, fill=text_color)
             y_text += line_height
 
@@ -124,12 +124,12 @@ class dm():
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(5/10))
-            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(6/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(1/20))
+            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/2),int(height/4)))
-            img.paste(code,(int(width*(1/50)),int(height*(2/10))))
+            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
