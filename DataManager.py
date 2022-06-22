@@ -78,7 +78,7 @@ class dm():
         lines = textwrap.wrap(text, width=40)
         for line in lines:
             line_width, line_height = font.getsize(line)
-            draw.text(((image_width - line_width) / 1.3, y_text), 
+            draw.text(((image_width - line_width) / 5, y_text), 
                     line, font=font, fill=text_color)
             y_text += line_height
 
@@ -88,7 +88,7 @@ class dm():
             str_to_num = f"{str_to_num}0"
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('CustomerID')
-        img =  PIL.Image.open('Phase1\src\CustomerID.png')
+        img =  Image.open('Phase1\src\CustomerID.png')
         return img
     
     def createbarcode(self,sku):
@@ -123,6 +123,7 @@ class dm():
         fonts_weight = ImageFont.truetype(self.font, size=15)
         fonts_sku = ImageFont.truetype(self.font, size=20)
         image_list = []
+        df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
             product = row['Product Name']
             product_name = product.split('(')[0]
@@ -131,19 +132,19 @@ class dm():
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
-            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(5/10))
+            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(6/10))
+            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(1/20))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/2),int(height/4)))
-            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
+            img.paste(code,(int(width*(1/50)),int(height*(2/10))))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Barcode Copy Complete")
     
     def Product_type(self,df):     #2
-        logo =  PIL.Image.open(os.path.join("Phase1","src","logo-web.png"))
+        logo =  Image.open(os.path.join("Phase1","src","logo-web.png"))
         width = 1240
         height = 1754
         head_font = ImageFont.truetype(self.font, size=160)
@@ -198,9 +199,9 @@ class dm():
         height = 1754
         font = ImageFont.truetype(self.font, size=90)
         for index, row in durianDF.iterrows():
-            if row['Product ID'] == Durian_ID[2]: sumbox += 24
-            elif row['Product ID'] == Durian_ID[1]: sumbox += 12
-            else: sumbox += 1
+            if row['Product ID'] == Durian_ID[2]: sumbox += 24*int(row['Line Item Quantity'])
+            elif row['Product ID'] == Durian_ID[1]: sumbox += 12*int(row['Line Item Quantity'])
+            else: sumbox += 1*int(row['Line Item Quantity'])
         box = { 'big':int(sumbox/boxshare[0]),
                 'small':int((sumbox%boxshare[0])/boxshare[1]),
                 'single':int((sumbox%boxshare[0])%boxshare[1])}
@@ -223,9 +224,8 @@ class dm():
         height = 4*75
         image_list = []
         font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
-        logo =  PIL.Image.open(os.path.join("Phase1","src","LogoBW.png"))
-
-        for i in range(Max):
+        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        for i in range(int(Max)):
             num = str(i+1)
             while len(num)<3:
                 num = f"0{num}"
@@ -309,4 +309,3 @@ class dm():
             image_list.append(img.convert('RGB'))
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
-        
