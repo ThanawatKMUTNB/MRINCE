@@ -65,14 +65,14 @@ class Ui(QtWidgets.QMainWindow):
             self.customer_name.clear()
             # set new text
             self.customer_name.setText(info['Customer Name'])
+            self.get_customer_item_list()
             self.show_item_list()
             
-    def show_item_list(self) -> None:
-        if self.ID == None:
-            return
+    def get_customer_item_list(self) -> None: 
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
 
+    def show_item_list(self) -> None:
         self.table.setRowCount(self.order_list.shape[0])
         for index, row in self.order_list.iterrows():
             self.table.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
@@ -87,10 +87,14 @@ class Ui(QtWidgets.QMainWindow):
         if item_ID == "":
             return
         SKU = self.readbarcode(item_ID)
-        if self.add_mode:
-            print(f'Add item {SKU}')
-        else:
-            print(f'Sub item {SKU}')
+        for index,row in self.order_list.iterrows():
+            if row['Item Code'] == SKU:
+                if self.add_mode:
+                    self.order_list.loc[index,'ItemGet'] += 1
+                elif self.order_list.loc[index,'ItemGet'] >0:
+                    self.order_list.loc[index,'ItemGet'] -= 1
+                break
+        self.show_item_list()
 
     def readbarcode(self, num : str) -> str:
         if num == "6979700123456":return "EOF"  #End of file
