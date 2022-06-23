@@ -78,7 +78,7 @@ class dm():
         lines = textwrap.wrap(text, width=40)
         for line in lines:
             line_width, line_height = font.getsize(line)
-            draw.text(((image_width - line_width) / 5, y_text), 
+            draw.text(((image_width - line_width) / 1.3, y_text), 
                     line, font=font, fill=text_color)
             y_text += line_height
 
@@ -107,7 +107,7 @@ class dm():
         return img
     
     def readbarcode(self,num):
-        if num == "6979700123456":return "EOF"  #End of file
+        if num[:-1] == "697970012345":return "EOF"  #End of file
         num = num[:-1]
         while num[-1] != "0": num = num[:-1]
         num = num[:-1]      #detect trash digits
@@ -132,12 +132,12 @@ class dm():
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(5/10))
-            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(6/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(1/20))
+            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/2),int(height/4)))
-            img.paste(code,(int(width*(1/50)),int(height*(2/10))))
+            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
@@ -145,22 +145,22 @@ class dm():
     
     def Product_type(self,df):     #2
         logo =  Image.open(os.path.join("Phase1","src","logo-web.png"))
-        width = 1240
-        height = 1754
-        head_font = ImageFont.truetype(self.font, size=160)
-        content_1_font = ImageFont.truetype(self.font, size=100)
-        content_2_font = ImageFont.truetype(self.font, size=60)
+        width = int(1240/2)
+        height = int(1754/2)
+        head_font = ImageFont.truetype(self.font, size=80)
+        content_1_font = ImageFont.truetype(self.font, size=50)
+        content_2_font = ImageFont.truetype(self.font, size=30)
         image_list = []
         for index, row in df.iterrows():
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
             text_color = (0,0,0)
-            self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 400)
-            self.draw_multiple_line_text(img, f"{re.findall('[0-9]+',row['Product Name'])[0]}  กรัม/แพ็ค", content_1_font, text_color, 700)
-            self.draw_multiple_line_text(img, f"{row['Product Name']}     {row['Product Categories']}", content_2_font, text_color, 1000)
-            self.draw_multiple_line_text(img, str(row['Line Item Quantity']), head_font, text_color, 1200)
-            self.draw_multiple_line_text(img, "แพ็ค", content_1_font, text_color, 1400)
-            img.paste(logo,(int(width/2.4),200))
+            self.draw_multiple_line_text(img, row['Product SKU'], head_font, text_color, 200)
+            self.draw_multiple_line_text(img, f"{re.findall('[0-9]+',row['Product Name'])[0]}  กรัม/แพ็ค", content_1_font, text_color, 350)
+            self.draw_multiple_line_text(img, f"{row['Product Name']}     {row['Product Categories']}", content_2_font, text_color, 500)
+            self.draw_multiple_line_text(img, str(row['Line Item Quantity']), head_font, text_color, 600)
+            self.draw_multiple_line_text(img, "แพ็ค", content_1_font, text_color, 700)
+            img.paste(logo,(int(width/3.3),20))
             image_list.append(img.convert('RGB'))
 
         image_list[0].save('Product_pages.pdf', save_all=True, append_images=image_list[1:])
@@ -240,6 +240,28 @@ class dm():
         image_list[0].save('Amount_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Amount Complete")
     
+    def Cover_3Copy(self,Max):
+        width = 4*100
+        height = 4*75
+        image_list = []
+        font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
+        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        for i in range(int(Max)):
+            num = str(i+1)
+            while len(num)<3:
+                num = f"0{num}"
+            img = PIL.Image.new('RGB', (width, height), color='white')
+            imgDraw = ImageDraw.Draw(img)
+            textWidth, textHeight = imgDraw.textsize(num, font=font)
+            xText = (width - textWidth) / 2
+            yText = (height - textHeight) / 2
+            for i in range(3):
+                imgDraw.text((xText, yText), num, font=font, fill=(0, 0, 0))
+                img.paste(logo,(int(width/2.7),50))
+                image_list.append(img.convert('RGB'))
+        image_list[0].save('Amount3Copy_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("Amount Complete")
+    
     def ExportDupCSV(self,df,dfPath):   #6
         try:
             self.ExportByProductTable = df
@@ -309,3 +331,5 @@ class dm():
             image_list.append(img.convert('RGB'))
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
+    
+    
