@@ -107,7 +107,7 @@ class dm():
         return img
     
     def readbarcode(self,num):
-        if num == "6979700123456":return "EOF"  #End of file
+        if num[:-1] == "697970012345":return "EOF"  #End of file
         num = num[:-1]
         while num[-1] != "0": num = num[:-1]
         num = num[:-1]      #detect trash digits
