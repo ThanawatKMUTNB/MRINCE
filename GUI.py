@@ -54,13 +54,15 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_7.clicked.connect(self.getParcelCover) #5
         self.pushButton_7.setStyleSheet("background-color : #6C88C4;color : white")
         
+        self.pushButton_11.clicked.connect(self.getParcelCover_3Copy) #5*3
+        self.pushButton_11.setStyleSheet("background-color : #C05780;color : white")
+        
+        
         self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
         self.pushButton_9.setStyleSheet("background-color : #00A5E3 ;color : white")
         
         self.pushButton_8.clicked.connect(self.CustomerProduct) #7
         self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
-        
-        self.pushButton_11.setStyleSheet("background-color : #C05780 ;color : white")
         
         self.pushButton_10.setStyleSheet("background-color : #FF5768 ;color : white")
         # font-size: 24px;
@@ -139,6 +141,14 @@ class Ui(QtWidgets.QMainWindow):
             # self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
             self.label_2.setText("Compleate")
             self.label_2.setStyleSheet("color : green")
+        except :
+            pass
+        
+    def getParcelCover_3Copy(self): #5
+        sdm = DataManager.dm()
+        try:
+            Max = int(self.lineEdit.text())
+            sdm.Cover_3Copy(Max)
         except :
             pass
         
