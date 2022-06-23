@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QWidget, QFileDialog
+from PyQt5.QtWidgets import QFileDialog
 import pandas as pd
+import textwrap
 
 import sys
 class Ui(QtWidgets.QMainWindow):
@@ -12,8 +13,10 @@ class Ui(QtWidgets.QMainWindow):
         self.select_file_button = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
         self.select_file_button.clicked.connect(self.load_file)
         self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton')
-        self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton_4')
-        self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton_5')
+        self.add_btn = self.findChild(QtWidgets.QPushButton, 'pushButton_4')
+        self.add_btn.clicked.connect(lambda : self.changeMode(True))
+        self.sub_btn = self.findChild(QtWidgets.QPushButton, 'pushButton_5')
+        self.sub_btn.clicked.connect(lambda : self.changeMode(False))
 
         # Label
         self.status = self.findChild(QtWidgets.QLabel, 'label_4')
@@ -25,6 +28,7 @@ class Ui(QtWidgets.QMainWindow):
         self.cus_ID = self.findChild(QtWidgets.QLineEdit, 'lineEdit')
         self.cus_ID.returnPressed.connect(self.show_customer_info)
         self.item_ID = self.findChild(QtWidgets.QLineEdit, 'lineEdit_3')
+        self.item_ID.returnPressed.connect(self.add_item)
 
         # table
         self.table = self.findChild(QtWidgets.QTableWidget, 'tableWidget')
@@ -61,20 +65,46 @@ class Ui(QtWidgets.QMainWindow):
             self.customer_name.clear()
             # set new text
             self.customer_name.setText(info['Customer Name'])
+            self.get_customer_item_list()
             self.show_item_list()
             
-    def show_item_list(self) -> None:
-        if self.ID == None:
-            return
+    def get_customer_item_list(self) -> None: 
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
 
+    def show_item_list(self) -> None:
         self.table.setRowCount(self.order_list.shape[0])
         for index, row in self.order_list.iterrows():
             self.table.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
 
+    def changeMode(self, add):
+         self.add_mode = True if add else  False
+
+    def add_item(self) -> None:
+        item_ID = self.item_ID.text()
+        if item_ID == "":
+            return
+        SKU = self.readbarcode(item_ID)
+        for index,row in self.order_list.iterrows():
+            if row['Item Code'] == SKU:
+                if self.add_mode:
+                    self.order_list.loc[index,'ItemGet'] += 1
+                elif self.order_list.loc[index,'ItemGet'] >0:
+                    self.order_list.loc[index,'ItemGet'] -= 1
+                break
+        self.show_item_list()
+
+    def readbarcode(self, num : str) -> str:
+        if num == "6979700123456":return "EOF"  #End of file
+        num = num[:-1]
+        while num[-1] != "0": num = num[:-1]
+        num = num[:-1]      #detect trash digits
+        chr_list = []
+        alpha = textwrap.wrap(num[:-4],2)       #split digit for character
+        for c in alpha: chr_list.append(str(chr(int(c))))   
+        return str("".join(chr_list)+num[-4:])
 
     def get_report(DF : pd.DataFrame) -> pd.DataFrame:
         data = pd.DataFrame(columns=['Item Name', 'Status', 'Item Qty'])
