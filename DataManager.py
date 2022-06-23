@@ -20,7 +20,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 class dm():
     def __init__(self):
-        self.font = "Phase1/src/Kanit-Light.ttf"
+        self.font = "src/Kanit-Light.ttf"
         
     def setdf(self,path):
         self.df = pd.read_csv(path)
@@ -88,7 +88,7 @@ class dm():
             str_to_num = f"{str_to_num}0"
         code = EAN13(str_to_num,writer=ImageWriter())
         code.save('CustomerID')
-        img =  Image.open('Phase1\src\CustomerID.png')
+        img =  Image.open('src\CustomerID.png')
         return img
     
     def createbarcode(self,sku):
@@ -144,7 +144,7 @@ class dm():
         print("Barcode Copy Complete")
     
     def Product_type(self,df):     #2
-        logo =  Image.open(os.path.join("Phase1","src","logo-web.png"))
+        logo =  Image.open(os.path.join("src","logo-web.png"))
         width = int(1240/2)
         height = int(1754/2)
         head_font = ImageFont.truetype(self.font, size=80)
@@ -223,8 +223,8 @@ class dm():
         width = 4*100
         height = 4*75
         image_list = []
-        font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
-        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        font = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
+        logo = Image.open(os.path.join("src","LogoBW.png"))
         for i in range(int(Max)):
             num = str(i+1)
             while len(num)<3:
@@ -244,8 +244,8 @@ class dm():
         width = 4*100
         height = 4*75
         image_list = []
-        font = ImageFont.truetype(os.path.join("Phase1","src","Kanit-Medium.ttf"), size=90)
-        logo = Image.open(os.path.join("Phase1","src","LogoBW.png"))
+        font = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
+        logo = Image.open(os.path.join("src","LogoBW.png"))
         for i in range(int(Max)):
             num = str(i+1)
             while len(num)<3:
