@@ -27,53 +27,84 @@ class Ui(QtWidgets.QMainWindow):
         self.combo.addItems(self.options)
         layout.addWidget(self.combo)
 
-        self.ExportByProductButton = self.findChild(QtWidgets.QPushButton, 'pushButton')
-        self.ExportByProductButton.clicked.connect(self.getPathExportByProduct)
+        self.label_3.setText("No choose file")
+        self.label_3.setStyleSheet("color : red")
         
-        self.ExportByProductCustomer = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
-        self.ExportByProductCustomer.clicked.connect(self.getPathExportByCustomer)
+        self.label_2.setText("No choose file")
+        self.label_2.setStyleSheet("color : red")
+        
+        self.pushButton.clicked.connect(self.getPathExportByProduct)
+        self.pushButton.setStyleSheet("background-color : blue;color : white")
+        
+        self.pushButton_2.clicked.connect(self.getPathExportByCustomer)
+        self.pushButton_2.setStyleSheet("background-color : blue;color : white")
         
         self.pushButton_3.clicked.connect(self.getBarcodeCopy) #1
+        self.pushButton_3.setStyleSheet("background-color : #FC6238;color : white")
         
         self.pushButton_4.clicked.connect(self.getProductType) #2
+        self.pushButton_4.setStyleSheet("background-color : #74737A;color : white")
         
         #3
+        self.pushButton_5.setStyleSheet("background-color : #0065A2;color : white")
         
         self.pushButton_6.clicked.connect(self.getDurianCrate) #4
+        self.pushButton_6.setStyleSheet("background-color : #FFBF65;color : white")
         
         self.pushButton_7.clicked.connect(self.getParcelCover) #5
+        self.pushButton_7.setStyleSheet("background-color : #6C88C4;color : white")
+        
+        self.pushButton_11.clicked.connect(self.getParcelCover_3Copy) #5*3
+        self.pushButton_11.setStyleSheet("background-color : #C05780;color : white")
+        
         
         self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
+        self.pushButton_9.setStyleSheet("background-color : #00A5E3 ;color : white")
         
         self.pushButton_8.clicked.connect(self.CustomerProduct) #7
+        self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
         
-        
-        self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
-        self.CustomerProductBT.clicked.connect(self.CustomerProduct)
-        self.show()
+        self.pushButton_10.setStyleSheet("background-color : #FF5768 ;color : white")
+        # font-size: 24px;
+        # self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
+        # self.CustomerProductBT.clicked.connect(self.CustomerProduct)
+        self.showMaximized()
+        # self.showFullScreen()
+        #setFixedSize
     
     def getBarcodeCopy(self): #1
         sdm = DataManager.dm()
         if self.ExportByProductPath != "":
+            self.label_7.setText("Waiting...")
+            self.label_7.setStyleSheet("color : red;")
             sdm.Barcode_Copy(self.ExportByProductTable)
-    
+            self.label_7.setText("Compleate")
+            self.label_7.setStyleSheet("color : green;")
+            
     def getProductType(self): #2
         sdm = DataManager.dm()
         if self.ExportByProductPath != "":
+            self.label_10.setText("Waiting...")
+            self.label_10.setStyleSheet("color : red;")
             sdm.Product_type(self.ExportByProductTable)
+            self.label_10.setText("Compleate")
+            self.label_10.setStyleSheet("color : green;")
             
     #3
     
     def getDurianCrate(self): #4
         sdm = DataManager.dm()
         if self.ExportByProductPath != "":
+            self.label_9.setText("Waiting...")
+            self.label_9.setStyleSheet("color : red;")
             sdm.Durian_crate(self.ExportByProductTable)
+            self.label_9.setText("Compleate")
+            self.label_9.setStyleSheet("color : green;")
     
     def getParcelCover(self): #5
         sdm = DataManager.dm()
         try:
             Max = int(self.lineEdit.text())
-            # print(int(self.lineEdit.text()),self.lineEdit.text())
             sdm.Cover(Max)
         except :
             pass
@@ -81,41 +112,50 @@ class Ui(QtWidgets.QMainWindow):
     def ExportDupCSV(self): #6
         if self.ExportByProductPath != "":
             self.label_5.setText("Waiting...")
-        self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
-        DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
-        print("Compleate")
-        if self.ExportByProductPath != "":
+            self.label_5.setStyleSheet("color : red;")
+            self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
+            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
             self.label_5.setText("Compleate")
+            self.label_5.setStyleSheet("color : green;")
             
     def CustomerProduct(self):#7
         sdm = DataManager.dm()
-        
         if self.ExportByCustomerPath != "":
             self.label_6.setText("Waiting...")
-        # try:
-        sdm.Customer_product(self.ExportByCustomerTable)
-        # except :
-        #     pass
-        if self.ExportByCustomerPath != "":
+            self.label_6.setStyleSheet("color : red;")
+            sdm.Customer_product(self.ExportByCustomerTable)
             self.label_6.setText("Compleate")
+            self.label_6.setStyleSheet("color : green;")
             
     def getPathExportByProduct(self):
         sdm = DataManager.dm()
         try:
+            self.label_2.setText("No choose file")
+            self.label_2.setStyleSheet("color : red")
             self.ExportByProductPath = self.launchDialog()
             self.label.setText(self.ExportByProductPath)
             sdm.setdf(self.ExportByProductPath)
-            
             self.ExportByProductTable = sdm.sort()
             model = PandasModel.PandasModel(self.ExportByProductTable)
             self.tableView.setModel(model)
-            self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
+            # self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
+            self.label_2.setText("Compleate")
+            self.label_2.setStyleSheet("color : green")
+        except :
+            pass
+        
+    def getParcelCover_3Copy(self): #5
+        sdm = DataManager.dm()
+        try:
+            Max = int(self.lineEdit.text())
+            sdm.Cover_3Copy(Max)
         except :
             pass
         
     def getPathExportByCustomer(self):
         sdm = DataManager.dm()
         try:
+            
             self.ExportByCustomerPath = self.launchDialog()
             self.label_4.setText(self.ExportByCustomerPath)
             
@@ -124,7 +164,9 @@ class Ui(QtWidgets.QMainWindow):
             self.ExportByCustomerTable = sdm.sort()
             model = PandasModel.PandasModel(self.ExportByCustomerTable)
             self.tableView_2.setModel(model)
-            self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
+            # self.label_3.setText("Count : "+str(len(self.ExportByCustomerTable)))
+            self.label_3.setText("Compleate")
+            self.label_3.setStyleSheet("color : green")
         except :
             pass
         
