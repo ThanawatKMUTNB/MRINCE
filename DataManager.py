@@ -219,6 +219,19 @@ class dm():
         img.save('Durian.pdf', save_all=True)
         print("Calculate Durians Complete")
     
+    def new_Durian_crate(self,newdf):
+        Customer_df = newdf
+        Durian_SKU = ['FT0012','FT0011','FT0015','FT0035','FT0025']     #ลังใหญ่, ลังเล็ก, กล่อง, ภูเขาไฟกล่องเดียว, ก้านยาวกล่องเดี่ยว
+        Customer_durian_df = Customer_df.loc[Customer_df['Item Code'].isin(Durian_SKU)][['No.','Customer Name','Item Code','Item Name','Item Qty']]
+        for index, row in Customer_durian_df.iterrows():
+            if row['Item Code'] == 'FT0012': Customer_durian_df.loc[index,'total'] = str(24*int(row['Item Qty']))
+            elif row['Item Code'] == 'FT0011': Customer_durian_df.loc[index,'total'] = str(12*int(row['Item Qty']))
+            else: Customer_durian_df.loc[index,'total'] = str(int(row['Item Qty']))
+        df_list = []
+        for item_code in Durian_SKU:
+            df_list.append(Customer_durian_df.loc[Customer_durian_df['Item Code'].isin([item_code])])
+        return df_list
+        
     def Cover(self,Max):        #5
         width = 4*100
         height = 4*75
