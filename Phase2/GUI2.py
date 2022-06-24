@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog
 import pandas as pd
 import textwrap
+from report import Ui_ReportWindow
 
 import sys
 class Ui(QtWidgets.QMainWindow):
@@ -13,6 +14,7 @@ class Ui(QtWidgets.QMainWindow):
         self.select_file_button = self.findChild(QtWidgets.QPushButton, 'pushButton_2')
         self.select_file_button.clicked.connect(self.load_file)
         self.end_button = self.findChild(QtWidgets.QPushButton, 'pushButton')
+        self.end_button.clicked.connect(self.show_report_window)
         self.add_btn = self.findChild(QtWidgets.QPushButton, 'pushButton_4')
         self.add_btn.clicked.connect(lambda : self.changeMode(True))
         self.sub_btn = self.findChild(QtWidgets.QPushButton, 'pushButton_5')
@@ -34,6 +36,12 @@ class Ui(QtWidgets.QMainWindow):
         self.table = self.findChild(QtWidgets.QTableWidget, 'tableWidget')
         self.table.setColumnCount(3)
 
+        # sub window
+        self.report_window = QtWidgets.QMainWindow()
+        self.report_ui = Ui_ReportWindow()
+        self.report_ui.setupUi(self.report_window)
+
+        # set up variable
         self.ID = None
         self.add_mode = True
         self.csv = pd.DataFrame()
@@ -73,6 +81,7 @@ class Ui(QtWidgets.QMainWindow):
         self.order_list = self.order_list.assign(ItemGet=0)
 
     def show_item_list(self) -> None:
+        self.table.setRowCount(0)
         self.table.setRowCount(self.order_list.shape[0])
         for index, row in self.order_list.iterrows():
             self.table.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
@@ -84,6 +93,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def add_item(self) -> None:
         item_ID = self.item_ID.text()
+        self.item_ID.clear()
         if item_ID == "":
             return
         SKU = self.readbarcode(item_ID)
@@ -106,10 +116,10 @@ class Ui(QtWidgets.QMainWindow):
         for c in alpha: chr_list.append(str(chr(int(c))))   
         return str("".join(chr_list)+num[-4:])
 
-    def get_report(DF : pd.DataFrame) -> pd.DataFrame:
+    def get_report(self) -> pd.DataFrame:
         data = pd.DataFrame(columns=['Item Name', 'Status', 'Item Qty'])
-        for index, row in DF.iterrows():
-            n = row['Item Qty'] - row['GetItem']
+        for index, row in self.order_list.iterrows():
+            n = row['Item Qty'] - row['ItemGet']
             if n > 0: # ขาด
                 df = pd.DataFrame(
                     {
@@ -130,6 +140,29 @@ class Ui(QtWidgets.QMainWindow):
                 continue
             data = pd.concat([data,df], ignore_index=True)
         return data
+
+    def show_report_window(self):
+        # getting report data
+        report = self.get_report()
+        missing_list = report[report['Status'] == 'ขาด'][['Item Name', 'Item Qty']]
+        over_list = report[report['Status'] == 'เกิน'][['Item Name', 'Item Qty']]
+
+        # clear old table
+        self.report_ui.tableWidget_2.setRowCount(0)
+        self.report_ui.tableWidget_2.setRowCount(0)
+
+        # insert data
+        self.report_ui.tableWidget_1.setRowCount(missing_list.shape[0])
+        for index, row in missing_list.iterrows():
+            self.report_ui.tableWidget_1.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
+            self.report_ui.tableWidget_1.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
+        self.report_ui.tableWidget_2.setRowCount(over_list.shape[0])
+        for index, row in over_list.iterrows():
+            self.report_ui.tableWidget_2.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
+            self.report_ui.tableWidget_2.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
+
+        self.report_window.show()
+        
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
