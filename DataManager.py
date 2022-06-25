@@ -219,7 +219,7 @@ class dm():
         img.save('Durian.pdf', save_all=True)
         print("Calculate Durians Complete")
     
-    def new_Durian_crate(self,newdf):
+    def new_Durian_crate(newdf):
         Customer_df = newdf
         Durian_SKU = ['FT0012','FT0011','FT0015','FT0035','FT0025']     #ลังใหญ่, ลังเล็ก, กล่อง, ภูเขาไฟกล่องเดียว, ก้านยาวกล่องเดี่ยว
         Customer_durian_df = Customer_df.loc[Customer_df['Item Code'].isin(Durian_SKU)][['No.','Customer Name','Item Code','Item Name','Item Qty']]
@@ -231,6 +231,55 @@ class dm():
         for item_code in Durian_SKU:
             df_list.append(Customer_durian_df.loc[Customer_durian_df['Item Code'].isin([item_code])])
         return df_list
+    
+    def new_Durian_crate_PDF(self,df,dfPath):
+        # try:
+            self.ExportByProductTable = df
+            self.ExportByProductPath = dfPath
+            fileName = os.path.basename(dfPath)
+            fileNameF = fileName.split("_")[0]
+            # ['FT0011','FT0012','FT0015','FT0025','FT0035','FT0480'] 
+            cols = list(self.ExportByProductTable.columns.values)
+            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
+                # self.ExportByCustomerTable
+                file_location = self.ExportByProductPath
+                # print(file_location)
+                file_name = os.path.basename(file_location)
+                # print(file_name)
+                newPath = file_location.replace(file_name, "Cleared_"+file_name)
+                # self.label_5.setText(newPath)
+                # self.ExportByProductTable.to_csv(newPath, index=False)
+                # print(newPath)
+                
+                pdfPath = newPath.replace(".csv",".pdf")
+                col_one_list = list(set(df['Product Categories'].tolist()))
+                # print(col_one_list)
+                # col_one_list = col_one_list.sort()1
+                elements = []
+                # print(col_one_list)
+                for i in col_one_list:
+                    print(i)
+                    rslt_df = df.loc[df['Product Categories'] == i]
+                    rslt_df = rslt_df.sort_values(by=['Product ID'])
+                    ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
+                    # doc = SimpleDocTemplate(pdfPath, pagesize=A4)
+                    doc = SimpleDocTemplate(pdfPath,pagesize=A4,
+                        rightMargin=18,leftMargin=18,
+                        topMargin=18,bottomMargin=18)
+                    # styleSheet = getSampleStyleSheet()
+                    data = ListOfList
+                    pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+                    t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('FONTSIZE', (0,0), (-1,-1),14)
+                                        ])
+                    
+                    elements.append(t)
+                    elements.append(PageBreak())
+                doc.build(elements) 
+        # except :
+        #     pass
         
     def Cover(self,Max):        #5
         width = 4*100
@@ -286,7 +335,8 @@ class dm():
                 # print(file_location)
                 file_name = os.path.basename(file_location)
                 # print(file_name)
-                newPath = file_location.replace(file_name, "Cleared_"+file_name)
+                newPath = dfPath
+                # newPath = file_location.replace(file_name, "Cleared_"+file_name)
                 # self.label_5.setText(newPath)
                 # self.ExportByProductTable.to_csv(newPath, index=False)
                 # print(newPath)

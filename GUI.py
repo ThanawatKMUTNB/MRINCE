@@ -144,10 +144,11 @@ class Ui(QtWidgets.QMainWindow):
     
     def ExportDupCSV(self): #6
         if self.ExportByProductPath != "":
+            ExportPath = self.launchDialogGetPath()
             self.label_5.setText("Waiting...")
             self.label_5.setStyleSheet("color : red;")
             self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
-            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
+            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,ExportPath)
             self.label_5.setText("Compleate")
             self.label_5.setStyleSheet("color : green;")
             
@@ -202,11 +203,30 @@ class Ui(QtWidgets.QMainWindow):
             self.label_3.setStyleSheet("color : green")
         except :
             pass
+    
+    def launchDialogGetPath(self):
+        self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
+        option = self.options.index('Save File Name')
+        # print(self.combo.currentText())
+        response = ''
+        if option == 0:
+            response = self.getFileName()
+        elif option == 1:
+            response = self.getFileNames()
+        elif option == 2:
+            response = self.getDirectory()
+        elif option == 3:
+            response = self.getSaveFileName()
+        else:
+            print('Got Nothing')
+        
+        if response != '' :
+            return response
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
         option = self.options.index(self.combo.currentText())
-        
+        # print(self.combo.currentText())
         response = ''
         if option == 0:
             response = self.getFileName()
@@ -241,13 +261,13 @@ class Ui(QtWidgets.QMainWindow):
         return response[0]
 
     def getFileNames(self): #>1 files
-        file_filter = 'Data File (*.xlsx *.csv *.dat);; Excel File (*.xlsx *.xls)'
+        file_filter = 'Data File (*.csv);; Excel File (*.csv)'
         response = QFileDialog.getOpenFileNames(
             parent=self,
             caption='Select a data file',
             directory=os.getcwd(),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls)'
+            initialFilter='Excel File (*.csv)'
         )
         return response[0]
 
@@ -259,13 +279,14 @@ class Ui(QtWidgets.QMainWindow):
         return response 
 
     def getSaveFileName(self):
-        file_filter = 'Data File (*.xlsx *.csv *.dat);; Excel File (*.xlsx *.xls)'
+        
+        file_filter = 'Data File (*.csv);; Excel File (*.xlsx *.xls)'
         response = QFileDialog.getSaveFileName(
             parent=self,
             caption='Select a data file',
-            directory= 'Data File.dat',
+            directory= os.path.basename(self.ExportByProductPath),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls)'
+            initialFilter='Excel File (*.csv)'
         )
         print(response)
         return response[0]
