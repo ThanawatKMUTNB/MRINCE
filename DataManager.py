@@ -395,4 +395,72 @@ class dm():
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
     
+    def btn_Invoice(self,df):      #total USD
+        use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+            use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
+            use_df.loc[index,'N.W. (kg)'] = float(net_weight)
+            use_df.loc[index,'Unit Price (USD)'] = 1     #edit
+            use_df.loc[index,'Total (USD)'] = float(net_weight)*2   #edit
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']].sort_values('Product SKU')
+            new_df.rename(columns={'Product SKU':'Code'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            df_dict[product] = new_df
+        return df_dict
+    
+    def btn_PackingList(self,df):      #Packing
+        use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+            use_df.loc[index,'Item'] = f"{row['Product SKU']} {row['Product Name'].split('(')[0]}"
+            use_df.loc[index,'Packing'] = 'xxx'
+            use_df.loc[index,'Net WT (Kg)'] = float(net_weight)
+            use_df.loc[index,'Gross WT (Kg)'] = 1
+            use_df.loc[index,'Volume (x1000 cc.)'] = float(net_weight)*2
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product].sort_values('Product SKU')
+            new_df.rename(columns={'Line Item Quantity':'Cts'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            new_df.drop(['Product SKU','Product Name','Product Categories'],axis=1,inplace=True)
+            cst_column = new_df.pop('Cts')
+            new_df.insert(3,'Cts',cst_column)
+            df_dict[product] = new_df
+        return df_dict
+
+    def btn_PackingSummary(self,df):    #Unit
+        use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+            use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
+            use_df.loc[index,'Unit'] = 'xxx'
+            use_df.loc[index,'N.W. (kg)'] = float(net_weight)
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','Line Item Quantity','Unit','N.W. (kg)']].sort_values('Product SKU')
+            new_df.rename(columns={'Product SKU':'Code','Line Item Quantity':'Quantity'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            df_dict[product] = new_df
+        return df_dict
     
