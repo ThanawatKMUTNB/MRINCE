@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QHeaderView
 
 
 class Ui_ReportWindow(object):
@@ -39,6 +40,9 @@ class Ui_ReportWindow(object):
         self.tableWidget_1.setColumnCount(2)
         self.tableWidget_1.setObjectName("tableWidget_1")
         self.tableWidget_1.setRowCount(0)
+        header_1 = self.tableWidget_1.horizontalHeader()
+        header_1.setSectionResizeMode(0, QHeaderView.Stretch)
+        header_1.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -69,6 +73,9 @@ class Ui_ReportWindow(object):
         self.tableWidget_2.setObjectName("tableWidget_2")
         self.tableWidget_2.setColumnCount(2)
         self.tableWidget_2.setRowCount(0)
+        header_2 = self.tableWidget_2.horizontalHeader()
+        header_2.setSectionResizeMode(0, QHeaderView.Stretch)
+        header_2.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         item = QtWidgets.QTableWidgetItem()
         font = QtGui.QFont()
         font.setPointSize(16)
