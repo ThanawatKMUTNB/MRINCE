@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QHeaderView
 import pandas as pd
 import textwrap
 from report import Ui_ReportWindow
@@ -183,6 +183,10 @@ class Ui_MainWindow(object):
 
         # table
         self.table.setColumnCount(3)
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
 
         # sub window
         self.report_window = QtWidgets.QMainWindow()
