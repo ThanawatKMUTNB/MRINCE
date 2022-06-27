@@ -5,16 +5,24 @@
 # )
 
 ###########################################3
+import os
 import pandas as pd
 import DataManager
 
 # df = pd.read_csv('Phase1\Order_Items_Export_-_2022-06-20.csv')
 # DataManager.dm.splitPageByProduct(DataManager.dm,df)
 
-df = pd.read_csv('L70_export_by_product.csv')
+df = pd.read_csv('orders-2022-06-20-00-16-07.csv')
 # x = DataManager.dm.dfSum(df)
-print(df.loc[df['Product Name']=='ปังสังขยา ตรา ชฎา (300 กรัม)'])
+# print(df.loc[df['Product Name']=='ปังสังขยา ตรา ชฎา (300 กรัม)'])
 # print(len(x))
+
+x = DataManager.dm.new_Durian_crate(df)
+print(x)
+
+# fileName = os.path.basename('Phase1\Order_Items_Export_-_2022-06-20.csv')
+# fileNameF = fileName.split("_")[0]
+# print(fileNameF)
 #######################3
 
 # from reportlab.lib import colors

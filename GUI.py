@@ -12,11 +12,6 @@ class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi('GUI_Mrince.ui', self)
-        self.ExportByProductPath = ""
-        self.ExportByCustomerPath = ""
-        
-        self.ExportByProductTable = ""
-        self.ExportByCustomerTable = ""
         
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -26,12 +21,8 @@ class Ui(QtWidgets.QMainWindow):
         self.combo = QComboBox()
         self.combo.addItems(self.options)
         layout.addWidget(self.combo)
-
-        self.label_3.setText("No choose file")
-        self.label_3.setStyleSheet("color : red")
         
-        self.label_2.setText("No choose file")
-        self.label_2.setStyleSheet("color : red")
+        self.clearAll()
         
         self.pushButton.clicked.connect(self.getPathExportByProduct)
         self.pushButton.setStyleSheet("background-color : blue;color : white")
@@ -65,13 +56,55 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
         
         self.pushButton_10.setStyleSheet("background-color : #FF5768 ;color : white")
+        self.pushButton_10.clicked.connect(self.clearAll) #7
         # font-size: 24px;
         # self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
         # self.CustomerProductBT.clicked.connect(self.CustomerProduct)
-        self.showMaximized()
         # self.showFullScreen()
+        self.showMaximized()
         #setFixedSize
     
+    def clearAll(self):
+        self.ExportByProductPath = ""
+        self.ExportByCustomerPath = ""
+        
+        self.ExportByProductTable = ""
+        self.ExportByCustomerTable = ""
+        
+        self.label_4.clear()
+        self.label.clear()
+        
+        self.label_3.setText("No choose file")
+        self.label_3.setStyleSheet("color : red")
+        
+        self.label_2.setText("No choose file")
+        self.label_2.setStyleSheet("color : red")
+        #5678910 Need Export by Product
+        
+        self.label_5.setText("Need Export by Product")
+        self.label_5.setStyleSheet("color : black")
+        
+        self.label_6.setText("Need Export by Product")
+        self.label_6.setStyleSheet("color : black")
+        
+        self.label_7.setText("Need Export by Product")
+        self.label_7.setStyleSheet("color : black")
+        
+        self.label_8.setText("Need Export by Product")
+        self.label_8.setStyleSheet("color : black")
+        
+        self.label_9.setText("Need Export by Product")
+        self.label_9.setStyleSheet("color : black")
+        
+        self.label_10.setText("Need Export by Product")
+        self.label_10.setStyleSheet("color : black")
+        
+        self.lineEdit.clear()
+        
+        self.tableView_2.setModel(None)
+        self.tableView.setModel(None)
+        
+        
     def getBarcodeCopy(self): #1
         sdm = DataManager.dm()
         if self.ExportByProductPath != "":
@@ -111,10 +144,11 @@ class Ui(QtWidgets.QMainWindow):
     
     def ExportDupCSV(self): #6
         if self.ExportByProductPath != "":
+            ExportPath = self.launchDialogGetPath()
             self.label_5.setText("Waiting...")
             self.label_5.setStyleSheet("color : red;")
             self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
-            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,self.ExportByProductPath)
+            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,ExportPath)
             self.label_5.setText("Compleate")
             self.label_5.setStyleSheet("color : green;")
             
@@ -169,11 +203,30 @@ class Ui(QtWidgets.QMainWindow):
             self.label_3.setStyleSheet("color : green")
         except :
             pass
+    
+    def launchDialogGetPath(self):
+        self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
+        option = self.options.index('Save File Name')
+        # print(self.combo.currentText())
+        response = ''
+        if option == 0:
+            response = self.getFileName()
+        elif option == 1:
+            response = self.getFileNames()
+        elif option == 2:
+            response = self.getDirectory()
+        elif option == 3:
+            response = self.getSaveFileName()
+        else:
+            print('Got Nothing')
+        
+        if response != '' :
+            return response
         
     def launchDialog(self):
         self.options = ('Get File Name', 'Get File Names', 'Get Folder Dir', 'Save File Name')
         option = self.options.index(self.combo.currentText())
-        
+        # print(self.combo.currentText())
         response = ''
         if option == 0:
             response = self.getFileName()
@@ -208,13 +261,13 @@ class Ui(QtWidgets.QMainWindow):
         return response[0]
 
     def getFileNames(self): #>1 files
-        file_filter = 'Data File (*.xlsx *.csv *.dat);; Excel File (*.xlsx *.xls)'
+        file_filter = 'Data File (*.csv);; Excel File (*.csv)'
         response = QFileDialog.getOpenFileNames(
             parent=self,
             caption='Select a data file',
             directory=os.getcwd(),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls)'
+            initialFilter='Excel File (*.csv)'
         )
         return response[0]
 
@@ -226,13 +279,14 @@ class Ui(QtWidgets.QMainWindow):
         return response 
 
     def getSaveFileName(self):
-        file_filter = 'Data File (*.xlsx *.csv *.dat);; Excel File (*.xlsx *.xls)'
+        
+        file_filter = 'Data File (*.csv);; Excel File (*.xlsx *.xls)'
         response = QFileDialog.getSaveFileName(
             parent=self,
             caption='Select a data file',
-            directory= 'Data File.dat',
+            directory= os.path.basename(self.ExportByProductPath),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls)'
+            initialFilter='Excel File (*.csv)'
         )
         print(response)
         return response[0]
