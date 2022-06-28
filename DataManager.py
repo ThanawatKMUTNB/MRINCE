@@ -13,11 +13,12 @@ import matplotlib as mpl
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, inch
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import PageBreak
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 class dm():
     def __init__(self):
         self.font = "src/Kanit-Light.ttf"
@@ -219,65 +220,148 @@ class dm():
         img.save('Durian.pdf', save_all=True)
         print("Calculate Durians Complete")
     
-    def new_Durian_crate(newdf):
+    def new_Durian_crate(self,newdf):
         Customer_df = newdf
-        Durian_SKU = ['FT0012','FT0011','FT0015','FT0035','FT0025']     #ลังใหญ่, ลังเล็ก, กล่อง, ภูเขาไฟกล่องเดียว, ก้านยาวกล่องเดี่ยว
+        Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']   #ลังใหญ่, ลังเล็ก, กล่อง, ภูเขาไฟกล่องเดียว, ก้านยาวกล่องเดี่ยว
+        # col_one_list = list(set(Customer_df['Item Code'].tolist()))
+        # col_one_list = sorted(col_one_list)
+        
+        # print(col_one_list)
+        
         Customer_durian_df = Customer_df.loc[Customer_df['Item Code'].isin(Durian_SKU)][['No.','Customer Name','Item Code','Item Name','Item Qty']]
         for index, row in Customer_durian_df.iterrows():
             if row['Item Code'] == 'FT0012': Customer_durian_df.loc[index,'total'] = str(24*int(row['Item Qty']))
             elif row['Item Code'] == 'FT0011': Customer_durian_df.loc[index,'total'] = str(12*int(row['Item Qty']))
             else: Customer_durian_df.loc[index,'total'] = str(int(row['Item Qty']))
-        df_list = []
-        for item_code in Durian_SKU:
-            df_list.append(Customer_durian_df.loc[Customer_durian_df['Item Code'].isin([item_code])])
-        return df_list
+        # print(Customer_durian_df)
+        Customer_durian_df = Customer_durian_df.sort_values(by=['Item Code'])
+        # print(Customer_durian_df)
+        # print(type(Customer_durian_df))
+        
+        # Customer_durian_df = Customer_durian_df.sort_values(by=['Item Code'])
+
+        # df_list = []
+        # for item_code in Durian_SKU:
+        #     df_list.append(Customer_durian_df.loc[Customer_durian_df['Item Code'].isin([item_code])])
+
+        # col_one_list = list(set(Customer_durian_df['Item Code'].tolist())) 
+        # print(col_one_list,Durian_SKU)
+        return Customer_durian_df
     
     def new_Durian_crate_PDF(self,df,dfPath):
         # try:
-            self.ExportByProductTable = df
-            self.ExportByProductPath = dfPath
+            dfFT = self.new_Durian_crate(df)
+            # self.ExportByProductPath = dfPath
             fileName = os.path.basename(dfPath)
             fileNameF = fileName.split("_")[0]
             # ['FT0011','FT0012','FT0015','FT0025','FT0035','FT0480'] 
-            cols = list(self.ExportByProductTable.columns.values)
-            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
-                # self.ExportByCustomerTable
-                file_location = self.ExportByProductPath
-                # print(file_location)
-                file_name = os.path.basename(file_location)
-                # print(file_name)
-                newPath = file_location.replace(file_name, "Cleared_"+file_name)
-                # self.label_5.setText(newPath)
-                # self.ExportByProductTable.to_csv(newPath, index=False)
-                # print(newPath)
                 
-                pdfPath = newPath.replace(".csv",".pdf")
-                col_one_list = list(set(df['Product Categories'].tolist()))
-                # print(col_one_list)
-                # col_one_list = col_one_list.sort()1
-                elements = []
-                # print(col_one_list)
-                for i in col_one_list:
-                    print(i)
-                    rslt_df = df.loc[df['Product Categories'] == i]
-                    rslt_df = rslt_df.sort_values(by=['Product ID'])
-                    ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
-                    # doc = SimpleDocTemplate(pdfPath, pagesize=A4)
-                    doc = SimpleDocTemplate(pdfPath,pagesize=A4,
-                        rightMargin=18,leftMargin=18,
-                        topMargin=18,bottomMargin=18)
-                    # styleSheet = getSampleStyleSheet()
-                    data = ListOfList
-                    pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
-                    t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            file_location = dfPath
+            # print(file_location)
+            file_name = os.path.basename(file_location)
+            
+            pdfPath = file_name.replace(".csv",".pdf")
+            
+            # col_one_list = list(set(dfFT['Item Code'].tolist()))
+            # print(col_one_list)
+            # col_one_list = col_one_list.sort()1
+            
+            doc = SimpleDocTemplate('Durian Order_'+pdfPath,pagesize=A4,
+                    rightMargin=20,leftMargin=20,
+                    topMargin=20,bottomMargin=20)
+            
+            elements = []
+            
+            ptext = [['รายการทุเรียน L...']]
+            
+            # s = getSampleStyleSheet()
+            # s = s["BodyText"]
+            # s.wordWrap = 'CJK'
+            pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+            style = ParagraphStyle(
+                                    name='Normal_CENTER',
+                                    fontName='THSarabunNew',
+                                    alignment=TA_CENTER,
+                                    fontSize=30,
+                                    # spaceAfter = 15,
+                                    leading = 40,
+                                    )
+            data2 = [[Paragraph(cell, style) for cell in row] for row in ptext]
+            t=Table(data2)
+            elements.append(t)
+            
+            Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']
+            cr = ['#FF458F','#FF8352','#DEE500','#00E1DF','#00C3AF']
+            pn = ['ทุเรียนแกะหมอนทอง (ลังเล็ก) (6000 กรัม)',
+                  'ทุเรียนแกะหมอนทอง (ลังใหญ่) (12000 กรัม)',
+                  'ทุเรียนกล่อง (เดี่ยว) (500 กรัม)',
+                  'ทุเรียนภูเขาไฟ (500 กรัม)',
+                  'ทุเรียนหมอนทองลูก (10000 กรัม)']
+            strC = 65
+            for i in range(5):
+                rslt_df = dfFT.loc[dfFT['Item Code'] == Durian_SKU[i]]
+                rslt_df = rslt_df.sort_values(by=['No.'])
+                # print(list(rslt_df['No.']))
+                # ItemName =rslt_df.loc[dfFT['Item Code'] == Durian_SKU[i], 'Item Name'].iloc[0]
+                # print(df2)
+                # ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
+                ListOfList = rslt_df.values.tolist()
+                style = getSampleStyleSheet()['Normal']
+
+                data = [[chr(strC),
+                         'Order no.',
+                         str(pn[i])+'\n\n'+'รหัสสินค้า : '+str(Durian_SKU[i]),
+                         'จำนวน']] 
+                ListofNo = list(rslt_df['No.'])
+                num = 1
+                totalN = 0
+                for j in ListofNo:
+                    CuN =rslt_df.loc[dfFT['No.'] == j, 'Customer Name'].iloc[0]
+                    ItQ =rslt_df.loc[dfFT['No.'] == j, 'Item Qty'].iloc[0]
+                    totalN += ItQ
+                    try:
+                        if i == 0:
+                            lineN = [num,j,CuN,str(ItQ)+'x12']
+                        elif i == 1:
+                            lineN = [num,j,CuN,str(ItQ)+'x24']
+                        elif i == 4:
+                            lineN = [num,j,CuN,str(ItQ)+'x10']
+                        else:
+                            lineN = [num,j,CuN,str(ItQ)]
+                        num += 1
+                        data.append(lineN)
+                    except :
+                        pass
+                if i == 0:
+                    lastSum = totalN*12
+                    data.append(['','','Total = '+str(totalN)+'x12'+' กล่อง',lastSum])
+                elif i == 1:
+                    lastSum = totalN*24
+                    data.append(['','','Total = '+str(totalN)+'x24'+' กล่อง',lastSum])
+                elif i == 4:
+                    lastSum = totalN*24
+                    data.append(['','','Total = '+str(totalN)+'x24'+' กล่อง',lastSum])
+                else:
+                    lastSum = totalN
+                    data.append(['','','Total = '+str(totalN)+' กล่อง',lastSum])
+                #+ ListOfList
+                strC += 1
+                
+                # print(ListOfList)
+                pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+                t=Table(data,style = [  ('BACKGROUND', (2, 0), (-1,0), str(cr[i])),
+                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
                                         ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                                         ('FONT', (0,0), (-1,-1),('THSarabunNew')),
-                                        ('FONTSIZE', (0,0), (-1,-1),14)
-                                        ])
-                    
-                    elements.append(t)
-                    elements.append(PageBreak())
-                doc.build(elements) 
+                                        ('FONTSIZE', (0,0), (-1,-1),20),
+                                        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                                        ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                        ('FONTSIZE', (0, 0), (0, 0), 30)
+                                        ],colWidths=[1*inch,1*inch,4*inch,1*inch], 
+                                        rowHeights=[1*inch]+[0.5*inch]*(len(ListofNo)+1))
+                elements.append(t)
+            #     # elements.append(PageBreak())
+            doc.build(elements) 
         # except :
         #     pass
         
