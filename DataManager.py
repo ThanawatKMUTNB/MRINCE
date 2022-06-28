@@ -127,7 +127,12 @@ class dm():
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
             product = row['Product Name']
-            product_name = product.split('(')[0]
+            product_name = row['Product Name'].split('(')
+            if len(product_name) > 2:
+                product_name.pop()
+                product_name = "".join(product_name)[:-2]
+            else:
+                product_name = product_name[0][:-1]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
             img = PIL.Image.new('RGB', (width, height), color='white')
@@ -479,4 +484,102 @@ class dm():
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
     
+    def unitPrice(self,customer_df):
+        product_price = {}
+        for index,row in customer_df[['Item Code','Item Price']].drop_duplicates(keep='first').iterrows(): 
+            product_price[row['Item Code']] = row['Item Price']
+        return product_price
+    
+    def btn_Invoice(self,product_df,customer_df):      #total USD
+        use_df = product_df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        product_price = self.unitPrice(customer_df)
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                #net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+                net_weight = format(float(net_weight),'.2f')
+            price = product_price[row['Product SKU']] 
+            product_name = row['Product Name'].split('(')
+            if len(product_name) > 2:
+                product_name.pop()
+                product_name = "".join(product_name)[:-2]
+            else:
+                product_name = product_name[0][:-1]
+            use_df.loc[index,'Product Name'] = str(product_name)
+            #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
+            use_df.loc[index,'N.W. (kg)'] = float(net_weight)
+            use_df.loc[index,'Unit Price (USD)'] = price
+            use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']].sort_values('Product SKU')
+            new_df.rename(columns={'Product SKU':'Code'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            df_dict[product] = new_df.values.tolist()
+        return df_dict
+    
+    # def btn_PackingList(self,df):      #Packing
+    #     use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+    #     for index, row in use_df.iterrows():    #calculate weight
+    #         net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+    #         if len(net_weight.split('.')[-1]) >1:
+    #             net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+    #         use_df.loc[index,'Item'] = f"{row['Product SKU']} {row['Product Name'].split('(')[0]}"
+    #         use_df.loc[index,'Packing'] = 'xxx'
+    #         use_df.loc[index,'Net WT (Kg)'] = float(net_weight)
+    #         use_df.loc[index,'Gross WT (Kg)'] = 1
+    #         use_df.loc[index,'Volume (x1000 cc.)'] = float(net_weight)*2
+
+    #     categories = list(set(use_df['Product Categories'].values.tolist()))
+    #     df_dict = {}
+    #     for product in categories:
+    #         new_df = use_df.loc[use_df['Product Categories']==product].sort_values('Product SKU')
+    #         new_df.rename(columns={'Line Item Quantity':'Cts'},inplace=True)
+    #         numlist = []
+    #         for n in range(len(new_df.index)): numlist.append(n+1)
+    #         new_df.insert(0,'No',numlist)
+    #         new_df.drop(['Product SKU','Product Name','Product Categories'],axis=1,inplace=True)
+    #         cst_column = new_df.pop('Cts')
+    #         new_df.insert(3,'Cts',cst_column)
+    #         df_dict[product] = new_df.values.tolist()
+    #     return df_dict
+
+    def btn_PackingSummary(self,df):    #Unit
+        use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        product_unit = {'FT0011':'12Box','FT0012':'24Box','VB':'Pack','DFT':'Piece','FT':'Kg','Else':'Pack'}
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                #net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+                net_weight = format(float(net_weight),'.2f')
+            product_name = row['Product Name'].split('(')
+            if len(product_name) > 2:
+                product_name.pop()
+                product_name = "".join(product_name)[:-2]
+            else:
+                product_name = product_name[0][:-1]
+            use_df.loc[index,'Product Name'] = str(product_name)
+            #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
+            if row['Product SKU'] in product_unit:
+                use_df.loc[index,'Unit'] = product_unit[row['Product SKU']]
+            elif re.findall('[a-zA-Z]+',row['Product SKU'])[0] in product_unit:
+                use_df.loc[index,'Unit'] = product_unit[re.findall('[a-zA-Z]+',row['Product SKU'])[0]]
+            else:
+                use_df.loc[index,'Unit'] = product_unit['Else']
+            use_df.loc[index,'N.W. (kg)'] = float(net_weight)
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','Line Item Quantity','Unit','N.W. (kg)']].sort_values('Product SKU')
+            new_df.rename(columns={'Product SKU':'Code','Line Item Quantity':'Quantity'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            df_dict[product] = new_df.values.tolist()
+        return df_dict
     
