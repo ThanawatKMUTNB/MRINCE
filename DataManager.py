@@ -308,26 +308,49 @@ class dm():
         print("Amount Complete")
     
     def Cover_3Copy(self,Max):
+        # width = 4*100
+        # height = 4*75
+        # image_list = []
+        # font = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
+        # logo = Image.open(os.path.join("src","LogoBW.png"))
+        # for i in range(int(Max)):
+        #     num = str(i+1)
+        #     while len(num)<3:
+        #         num = f"0{num}"
+        #     img = PIL.Image.new('RGB', (width, height), color='white')
+        #     imgDraw = ImageDraw.Draw(img)
+        #     textWidth, textHeight = imgDraw.textsize(num, font=font)
+        #     xText = (width - textWidth) / 2
+        #     yText = (height - textHeight) / 2
+        #     for i in range(3):
+        #         imgDraw.text((xText, yText), num, font=font, fill=(0, 0, 0))
+        #         img.paste(logo,(int(width/2.7),50))
+        #         image_list.append(img.convert('RGB'))
+        # image_list[0].save('Amount3Copy_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("Amount Complete")
+    
+    def Order_label(self,customer_df):
         width = 4*100
         height = 4*75
         image_list = []
-        font = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
+        no_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
+        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=30)
         logo = Image.open(os.path.join("src","LogoBW.png"))
-        for i in range(int(Max)):
-            num = str(i+1)
-            while len(num)<3:
-                num = f"0{num}"
-            img = PIL.Image.new('RGB', (width, height), color='white')
-            imgDraw = ImageDraw.Draw(img)
-            textWidth, textHeight = imgDraw.textsize(num, font=font)
-            xText = (width - textWidth) / 2
-            yText = (height - textHeight) / 2
-            for i in range(3):
-                imgDraw.text((xText, yText), num, font=font, fill=(0, 0, 0))
-                img.paste(logo,(int(width/2.7),50))
-                image_list.append(img.convert('RGB'))
-        image_list[0].save('Amount3Copy_pages.pdf', save_all=True, append_images=image_list[1:])
-        print("Amount Complete")
+        order_id = {}
+        for index, row in customer_df.iterrows():
+            if not row['No.'] in order_id: order_id[row['No.']] = row['Customer Name']
+        text_color = (0,0,0)
+        for no in order_id:
+            customer_name = order_id[no]
+            text_color = (0,0,0)
+            img = Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)
+            self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text(img, customer_name, name_fonts, text_color, height*(7/10))
+            img.paste(logo,(int(width/2.7),50))
+            for copy in range(3): image_list.append(img.convert('RGB'))
+        image_list[0].save('OrderLabel_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("OrderLabel Complete")
     
     def ExportDupCSV(self,df,dfPath):   #6
         try:
