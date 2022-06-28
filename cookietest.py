@@ -1,3 +1,43 @@
+x = [1,2,3,4]
+print(x[-2])
+#########
+# # from reportlab.lib import colors
+# from reportlab.lib.pagesizes import LETTER, inch, portrait
+# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+# from reportlab.lib.styles import getSampleStyleSheet
+
+
+# doc = SimpleDocTemplate("kkk.pdf", pagesize=LETTER, rightMargin=30,leftMargin=30, topMargin=30,bottomMargin=18)
+# doc.pagesize = portrait(LETTER)
+# elements = []
+
+
+# data = [
+#         ["Directory"],
+#         ["AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA "],
+#         ]
+
+
+# style = TableStyle([('ALIGN',(1,1),(-2,-2),'RIGHT'),
+#                        ('TEXTCOLOR',(1,1),(-2,-2),colors.red),
+#                        ('VALIGN',(0,0),(0,-1),'TOP'),
+#                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+#                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+#                        ])
+
+# #Configure style and word wrap
+# s = getSampleStyleSheet()
+# s = s["BodyText"]
+# s.wordWrap = 'CJK'
+# data2 = [[Paragraph(cell, s) for cell in row] for row in data]
+# t=Table(data2)
+# # t.setStyle(style)
+
+
+# #Send the data and build the file
+# elements.append(t)
+# doc.build(elements)
+################################
 # from pip.operations import freeze  
 
 # modules = list(
@@ -5,24 +45,24 @@
 # )
 
 ###########################################3
-import os
-import pandas as pd
-import DataManager
+# import os
+# import pandas as pd
+# import DataManager
 
 # df = pd.read_csv('Phase1\Order_Items_Export_-_2022-06-20.csv')
-# DataManager.dm.splitPageByProduct(DataManager.dm,df)
+# # DataManager.dm.splitPageByProduct(DataManager.dm,df)
 
-df = pd.read_csv('orders-2022-06-20-00-16-07.csv')
-# x = DataManager.dm.dfSum(df)
-# print(df.loc[df['Product Name']=='ปังสังขยา ตรา ชฎา (300 กรัม)'])
-# print(len(x))
+# df = pd.read_csv('orders-2022-06-20-00-16-07.csv')
+# # x = DataManager.dm.dfSum(df)
+# # print(df.loc[df['Product Name']=='ปังสังขยา ตรา ชฎา (300 กรัม)'])
+# # print(len(x)) ,'Desktop\kkk.csv'
 
-x = DataManager.dm.new_Durian_crate(df)
-print(x)
+# x = DataManager.dm.new_Durian_crate_PDF(DataManager.dm,df,'')
+# # print(x)
 
-# fileName = os.path.basename('Phase1\Order_Items_Export_-_2022-06-20.csv')
-# fileNameF = fileName.split("_")[0]
-# print(fileNameF)
+# # fileName = os.path.basename('Phase1\Order_Items_Export_-_2022-06-20.csv')
+# # fileNameF = fileName.split("_")[0]
+# # print(fileNameF)
 #######################3
 
 # from reportlab.lib import colors

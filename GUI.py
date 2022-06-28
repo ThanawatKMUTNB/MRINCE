@@ -130,7 +130,7 @@ class Ui(QtWidgets.QMainWindow):
         if self.ExportByProductPath != "":
             self.label_9.setText("Waiting...")
             self.label_9.setStyleSheet("color : red;")
-            sdm.Durian_crate(self.ExportByProductTable)
+            sdm.new_Durian_crate_PDF(self.ExportByProductTable,self.ExportByProductPath)
             self.label_9.setText("Compleate")
             self.label_9.setStyleSheet("color : green;")
     
@@ -143,15 +143,18 @@ class Ui(QtWidgets.QMainWindow):
             pass
     
     def ExportDupCSV(self): #6
-        if self.ExportByProductPath != "":
-            ExportPath = self.launchDialogGetPath()
-            self.label_5.setText("Waiting...")
-            self.label_5.setStyleSheet("color : red;")
-            self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
-            DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,ExportPath)
-            self.label_5.setText("Compleate")
-            self.label_5.setStyleSheet("color : green;")
-            
+        try:
+            if self.ExportByProductPath != "":
+                ExportPath = self.launchDialogGetPath()
+                self.label_5.setText("Waiting...")
+                self.label_5.setStyleSheet("color : red;")
+                self.ExportByProductTable = DataManager.dm.dfSum(self.ExportByProductTable)
+                DataManager.dm.ExportDupCSV(self,self.ExportByProductTable,ExportPath)
+                self.label_5.setText("Compleate")
+                self.label_5.setStyleSheet("color : green;")
+        except :
+            pass
+        
     def CustomerProduct(self):#7
         sdm = DataManager.dm()
         if self.ExportByCustomerPath != "":
