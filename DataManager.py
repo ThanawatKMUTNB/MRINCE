@@ -126,13 +126,13 @@ class dm():
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
+            if not (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
             product = row['Product Name']
             product_name = row['Product Name'].split('(')
             if len(product_name) > 2:
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
-            else:
-                product_name = product_name[0][:-1]
+            else: product_name = product_name[0][:-1]
             product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
             product_sku = row['Product SKU']
             img = PIL.Image.new('RGB', (width, height), color='white')
@@ -526,8 +526,7 @@ class dm():
             if len(product_name) > 2:
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
-            else:
-                product_name = product_name[0][:-1]
+            else: product_name = product_name[0][:-1]
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             use_df.loc[index,'N.W. (kg)'] = float(net_weight)
@@ -583,8 +582,7 @@ class dm():
             if len(product_name) > 2:
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
-            else:
-                product_name = product_name[0][:-1]
+            else: product_name = product_name[0][:-1]
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             if row['Product SKU'] in product_unit:
