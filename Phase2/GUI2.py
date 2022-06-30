@@ -158,6 +158,18 @@ class Ui_MainWindow(object):
         self.table.horizontalHeader().setCascadingSectionResizes(False)
         self.table.horizontalHeader().setSortIndicatorShown(False)
         self.table.verticalHeader().setVisible(False)
+        self.clearBtn = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.clearBtn.sizePolicy().hasHeightForWidth())
+        self.clearBtn.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.clearBtn.setFont(font)
+        self.clearBtn.setObjectName("clearBtn")
+        self.clearBtn.clicked.connect(self.clear_data)
+        self.gridLayout.addWidget(self.clearBtn, 4, 2, 1, 1)
         self.gridLayout.addWidget(self.table, 5, 0, 1, 3)
         self.MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(self.MainWindow)
@@ -194,10 +206,12 @@ class Ui_MainWindow(object):
         self.report_ui.setupUi(self.report_window)
 
         # set up variable
+        self.changeMode(True)
         self.ID = None
         self.add_mode = True
         self.csv = pd.DataFrame()
         self.order_list = pd.DataFrame()
+        self.all_order_list = pd.DataFrame()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -218,6 +232,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "จำนวนที่สั่ง"))
         item = self.table.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "จำนวนที่ได้"))
+        self.clearBtn.setText(_translate("MainWindow", "Clear"))
 
     def load_file(self) -> None:
         options = QFileDialog.Options()
@@ -228,7 +243,13 @@ class Ui_MainWindow(object):
             self.csv = pd.read_csv(fileName)
             self.file_name_label.setText(fileName)
             self.status.setText('สถานะ : พร้อม')
+            self.set_all_order_list()
     
+    def set_all_order_list(self):
+        if self.csv.empty:
+            return
+        self.all_order_list = self.csv.drop_duplicates(subset=['Item Code']).reset_index(drop=True)[['Item Code', 'Item Name']].copy()
+
     def show_customer_info(self) -> None:
         if self.csv.empty:
             return
@@ -259,22 +280,42 @@ class Ui_MainWindow(object):
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
 
+    def clear_data(self) -> None:
+        self.table.setRowCount(0)
+        self.item_ID.clear()
+        self.customer_name.clear()
+        self.cus_ID.clear()
+        self.order_list = pd.DataFrame()
+
     def changeMode(self, add):
-         self.add_mode = True if add else  False
+        if add:
+            self.add_mode = True 
+            self.add_btn.setStyleSheet("background-color : Green")
+            self.sub_btn.setStyleSheet("background-color : None")
+        else:
+            self.add_mode = False
+            self.add_btn.setStyleSheet("background-color : None")
+            self.sub_btn.setStyleSheet("background-color : Red")
 
     def add_item(self) -> None:
         item_ID = self.item_ID.text()
         self.item_ID.clear()
-        if item_ID == "":
+        if (item_ID == "") or (len(item_ID) != 13) or not (item_ID.isnumeric()):
             return
         SKU = self.readbarcode(item_ID)
+        found = False
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
                 if self.add_mode:
                     self.order_list.loc[index,'ItemGet'] += 1
                 elif self.order_list.loc[index,'ItemGet'] >0:
                     self.order_list.loc[index,'ItemGet'] -= 1
+                found = True
                 break
+        if not found:
+            item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
+            row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1}
+            self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
         self.show_item_list()
 
     def readbarcode(self, num : str) -> str:
@@ -315,8 +356,8 @@ class Ui_MainWindow(object):
     def show_report_window(self):
         # getting report data
         report = self.get_report()
-        missing_list = report[report['Status'] == 'ขาด'][['Item Name', 'Item Qty']]
-        over_list = report[report['Status'] == 'เกิน'][['Item Name', 'Item Qty']]
+        missing_list = report[report['Status'] == 'ขาด'][['Item Name', 'Item Qty']].reset_index(drop=True)
+        over_list = report[report['Status'] == 'เกิน'][['Item Name', 'Item Qty']].reset_index(drop=True)
 
         # clear old table
         self.report_ui.tableWidget_2.setRowCount(0)
