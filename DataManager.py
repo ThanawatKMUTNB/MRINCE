@@ -1,3 +1,4 @@
+from datetime import date
 import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
@@ -19,6 +20,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.platypus import Image as ims
+from reportlab.platypus import Spacer
+
 class dm():
     def __init__(self):
         self.font = "src/Kanit-Light.ttf"
@@ -524,6 +528,247 @@ class dm():
             df_dict[product] = new_df.values.tolist()
         return df_dict
     
+    def invoicePDF(self,dfProduct,dfCustumer):
+        df1 = dfProduct
+        df2 = dfCustumer
+        today = date.today()
+        doc = SimpleDocTemplate("Invoic_"+str(today.strftime("%Y%m%d"))+".pdf",pagesize=A4,
+                                rightMargin=100,leftMargin=100,
+                                topMargin=20,bottomMargin=20)
+        pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+
+        Story=[]
+        logo = "Phase1\src\logo-web.png"
+        paperHead = '<b>Invoic</b>'
+        noByDate = 'No '+str(today.strftime("%Y%m%d"))
+        DateToday = 'Date '+str(today.strftime("%d %B %Y"))
+        textExpH = 'Exporter...'
+        textImpH = 'Importer...'
+        textExp = ['Ince TH Trade Co.,Ltd.',
+                   '37/346 M.7 Klong2 KlongLoung',
+                   'Pathum Thani 12120',
+                   'Thailand',
+                   'Tel. +66874940303',
+                   'Email. Lyn@mrince.com',
+                   'Tax Id. 013556214814']
+        textImp = ['Ince UK limited',
+                   '7 Blackstock Road London N4 2JF',
+                   'United Kingdom',
+                   'Tel. +447427267206',
+                   'Email. Kemal@mrince.com',
+                   'Tax Id. 08760604','']
+
+        adressData = [[textExpH,textImpH]]
+        for i,s in zip(textExp,textImp):
+            adressData.append(['    '+i,'   '+s])
+
+        t = Table(adressData,style = [  ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('FONTSIZE', (0,0), (-1,-1),12)
+                                        ],colWidths=[250,250])
+        im = ims(logo, 1*inch, 0.5*inch)
+        Story.append(im)
+        styles=getSampleStyleSheet()
+        # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+        styles.add(ParagraphStyle(name='Normal_CENTER',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_CENTER,
+                                fontSize=20,
+                                leading=13,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        styles.add(ParagraphStyle(name='Normal_Right',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_RIGHT,
+                                fontSize=20,
+                                leading=13,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        Story.append(Paragraph(paperHead, styles["Normal_CENTER"]))
+        Story.append(Spacer(1, 12))
+
+        Story.append(Paragraph(noByDate, styles["Normal_Right"]))
+        Story.append(Spacer(1, 12))
+
+        Story.append(Paragraph(DateToday, styles["Normal_Right"]))
+        Story.append(Spacer(1, 12))
+
+        Story.append(t)
+        Story.append(Spacer(1, 12))
+
+        dataDict = self.btn_Invoice(df1,df2)
+        key_list = list(dataDict.keys())
+        tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+        td = Table(tableData,style = [  ('BACKGROUND', (0, 0), (-1,-1), '#D2D2D2'),
+                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                        ('FONTSIZE', (0,0), (-1,-1),15),
+                                        ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                        ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                            rowHeights=0.4*inch)
+        Story.append(td)
+        for i in key_list:
+            tableData = [[str(i),'','','','']]
+            # tableData = tableData +[[str(i)]]
+            tableData = tableData + dataDict[i]
+            nwSum = 0
+            totalSum = 0
+            for j in dataDict[i]:
+                nwSum += float(j[-3])
+                totalSum += float(j[-1])
+            # print(round(nwSum, 2),round(totalSum, 2))
+            tableData = tableData + [[str(i)+' Total','','',round(nwSum, 2),'',round(totalSum, 2)]]
+            td = Table(tableData,style = [  ('SPAN', (0,0), (-1,0)),
+                                            ('SPAN', (0,-1), (2,-1)),
+                                            ('BACKGROUND', (0,-1), (2,-1), '#D2D2D2'),
+                                            ('BACKGROUND', (4,-1), (4,-1), '#D2D2D2'),
+                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                            # ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                            ('FONTSIZE', (0,0), (-1,-1),16)
+                                            ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                            rowHeights=0.4*inch)
+            Story.append(td)
+        # Story.append(td)
+        Story.append(Spacer(1, 12))
+
+        doc.build(Story)
+        
+    def packingSumPDF(self,dfProduct):
+        df1 = dfProduct
+        today = date.today()
+        doc = SimpleDocTemplate("Packing_Summary_"+str(today.strftime("%Y%m%d"))+".pdf",pagesize=A4,
+                                rightMargin=100,leftMargin=100,
+                                topMargin=20,bottomMargin=20)
+        pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+
+        Story=[]
+        logo = "Phase1\src\logo-web.png"
+        paperHead = '<b>Invoic</b>'
+        noByDate = 'Ref No : '+str(today.strftime("%Y%m%d"))
+        textExpH = 'Exporter...'
+        textImpH = 'Importer...'
+        textExp = ['Ince TH Trade Co.,Ltd.',
+                   '37/346 M.7 Klong2 KlongLoung',
+                   'Pathum Thani 12120',
+                   'Thailand',
+                   'Tel. +66874940303',
+                   'Email. Lyn@mrince.com',
+                   'Tax Id. 013556214814']
+        textImp = ['Ince UK limited',
+                   '7 Blackstock Road London N4 2JF',
+                   'United Kingdom',
+                   'Tel. +447427267206',
+                   'Email. Kemal@mrince.com',
+                   'Tax Id. 08760604','']
+
+        adressData = [[textExpH,textImpH]]
+        for i,s in zip(textExp,textImp):
+            adressData.append(['    '+i,'   '+s])
+
+        t = Table(adressData,style = [  ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('FONTSIZE', (0,0), (-1,-1),12)
+                                        ],colWidths=[250,250])
+        im = ims(logo, 1*inch, 0.5*inch)
+        Story.append(im)
+        styles=getSampleStyleSheet()
+        # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+        styles.add(ParagraphStyle(name='Normal_CENTER',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_CENTER,
+                                fontSize=20,
+                                leading=13,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        styles.add(ParagraphStyle(name='Normal_Right',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_RIGHT,
+                                fontSize=20,
+                                leading=13,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        Story.append(Paragraph(paperHead, styles["Normal_CENTER"]))
+        Story.append(Spacer(1, 12))
+
+        Story.append(Paragraph(noByDate, styles["Normal_Right"]))
+        Story.append(Spacer(1, 12))
+
+        Story.append(t)
+        Story.append(Spacer(1, 12))
+
+        dataDict = self.btn_PackingSummary(df1)
+        key_list = list(dataDict.keys())
+        tableData = [['No','Code','Product Name','Quantity','Unit','N.W. (kg)']]
+        td = Table(tableData,style = [  ('BACKGROUND', (0, 0), (-1,-1), '#D2D2D2'),
+                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                        ('FONTSIZE', (0,0), (-1,-1),15),
+                                        ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                        ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                            rowHeights=0.4*inch)
+        Story.append(td)
+        for i in key_list:
+            tableData = [[str(i),'','','','']]
+            # tableData = tableData +[[str(i)]]
+            tableData = tableData + dataDict[i]
+            nwSum = 0
+            for j in dataDict[i]:
+                nwSum += float(j[-1])
+            # print(round(nwSum, 2),round(totalSum, 2))
+            tableData = tableData + [[str(i)+' Weigh','','','','',round(nwSum, 2)]]
+            td = Table(tableData,style = [  ('SPAN', (0,0), (-1,0)),
+                                            ('SPAN', (0,-1), (4,-1)),
+                                            ('BACKGROUND', (0,-1), (4,-1), '#D2D2D2'),
+                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                            # ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                            ('FONTSIZE', (0,0), (-1,-1),16)
+                                            ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                            rowHeights=0.4*inch)
+            Story.append(td)
+        # Story.append(td)
+        Story.append(Spacer(1, 12))
+
+        doc.build(Story)
     # def btn_PackingList(self,df):      #Packing
     #     use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
     #     for index, row in use_df.iterrows():    #calculate weight

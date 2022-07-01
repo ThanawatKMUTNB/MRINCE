@@ -54,7 +54,10 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
         
         self.pushButton_14.setStyleSheet("background-color : #8AAB93 ;color : white") #8
-        self.pushButton_14.clicked.connect(self.getInvoice)
+        self.pushButton_14.clicked.connect(self.getInvoice) #getPackingSum
+        
+        self.pushButton_12.setStyleSheet("background-color : #F2B88A ;color : white") #8
+        self.pushButton_12.clicked.connect(self.getPackingSum)
         
         self.pushButton_11.clicked.connect(self.getParcelCover_3Copy) #10 #5*3
         self.pushButton_11.setStyleSheet("background-color : #C05780;color : white")
@@ -109,6 +112,9 @@ class Ui(QtWidgets.QMainWindow):
         
         self.label_12.setText("Need Export by Product / Customer")
         self.label_12.setStyleSheet("color : black")
+        
+        self.label_14.setText("Need Export by Product")
+        self.label_14.setStyleSheet("color : black")
         
         self.lineEdit.clear()
         
@@ -180,10 +186,19 @@ class Ui(QtWidgets.QMainWindow):
         if self.ExportByCustomerPath != "" and self.ExportByProductPath != "":
             self.label_12.setText("Waiting...")
             self.label_12.setStyleSheet("color : red;")
-            sdm.btn_Invoice(self.ExportByProductTable,self.ExportByCustomerTable)
+            sdm.invoicePDF(self.ExportByProductTable,self.ExportByCustomerTable)
             self.label_12.setText("Compleate")
             self.label_12.setStyleSheet("color : green;")
     
+    def getPackingSum(self): #9
+        sdm = DataManager.dm()
+        if self.ExportByProductPath != "":
+            self.label_14.setText("Waiting...")
+            self.label_14.setStyleSheet("color : red;")
+            sdm.packingSumPDF(self.ExportByProductTable)
+            self.label_14.setText("Compleate")
+            self.label_14.setStyleSheet("color : green;")
+            
     def getParcelCover_3Copy(self): #10
         sdm = DataManager.dm()
         try:

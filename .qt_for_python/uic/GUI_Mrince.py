@@ -426,7 +426,6 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.label_14.setFont(font)
         self.label_14.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.label_14.setText("")
         self.label_14.setAlignment(QtCore.Qt.AlignCenter)
         self.label_14.setObjectName("label_14")
         self.gridLayout_3.addWidget(self.label_14, 8, 3, 1, 1)
@@ -464,3 +463,4 @@ class Ui_MainWindow(object):
         self.label_12.setText(_translate("MainWindow", "Need Export by Product / Customer"))
         self.label_11.setText(_translate("MainWindow", "Need Export by Customer"))
         self.pushButton_10.setText(_translate("MainWindow", "Clear All Data"))
+        self.label_14.setText(_translate("MainWindow", "Need Export by Product"))

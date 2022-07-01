@@ -21,7 +21,7 @@ import DataManager
 today = date.today()
 doc = SimpleDocTemplate("Invoic.pdf",pagesize=A4,
                         rightMargin=100,leftMargin=100,
-                        topMargin=72,bottomMargin=18)
+                        topMargin=20,bottomMargin=20)
 pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
 
 Story=[]
