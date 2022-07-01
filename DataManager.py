@@ -298,7 +298,7 @@ class dm():
             elements.append(t)
             
             Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']
-            cr = ['#FF458F','#FF8352','#DEE500','#00E1DF','#00C3AF']
+            cr = ['#FF458F','#FTA_CENTERF8352','#DEE500','#00E1DF','#00C3AF']
             pn = ['ทุเรียนแกะหมอนทอง (ลังเล็ก) (6000 กรัม)',
                   'ทุเรียนแกะหมอนทอง (ลังใหญ่) (12000 กรัม)',
                   'ทุเรียนกล่อง (เดี่ยว) (500 กรัม)',
@@ -538,7 +538,7 @@ class dm():
         pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
 
         Story=[]
-        logo = "Phase1\src\logo-web.png"
+        logo = "src\logo-web.png"
         paperHead = '<b>Invoic</b>'
         noByDate = 'No '+str(today.strftime("%Y%m%d"))
         DateToday = 'Date '+str(today.strftime("%d %B %Y"))
@@ -662,7 +662,7 @@ class dm():
         pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
 
         Story=[]
-        logo = "Phase1\src\logo-web.png"
+        logo = "src\logo-web.png"
         paperHead = '<b>Invoic</b>'
         noByDate = 'Ref No : '+str(today.strftime("%Y%m%d"))
         textExpH = 'Exporter'
