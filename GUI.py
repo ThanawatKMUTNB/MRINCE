@@ -187,7 +187,11 @@ class Ui(QtWidgets.QMainWindow):
     def getParcelCover_3Copy(self): #10
         sdm = DataManager.dm()
         try:
+            self.label_11.setText("Waiting...")
+            self.label_11.setStyleSheet("color : red;")
             sdm.Order_label(self.ExportByCustomerTable)
+            self.label_11.setText("Compleate")
+            self.label_11.setStyleSheet("color : green;")
         except :
             pass
         

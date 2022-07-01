@@ -20,7 +20,7 @@ import DataManager
 
 today = date.today()
 doc = SimpleDocTemplate("Invoic.pdf",pagesize=A4,
-                        rightMargin=72,leftMargin=150,
+                        rightMargin=100,leftMargin=100,
                         topMargin=72,bottomMargin=18)
 pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
 
@@ -40,10 +40,12 @@ for i,s in zip(textExp,textImp):
 
 t = Table(adressData,style = [  ('FONT', (0,0), (-1,-1),('THSarabunNew')),
                                 ('FONTSIZE', (0,0), (-1,-1),12)
-                                ],colWidths=[285,285])
+                                ],colWidths=[250,250])
 df1 = pd.read_csv('Phase1\Order_Items_Export_-_2022-06-20.csv')
 df2 = pd.read_csv('orders-2022-06-20-00-16-07.csv')
-print(DataManager.dm.btn_Invoice(DataManager.dm,df2,df1))
+# print(DataManager.dm.btn_Invoice(DataManager.dm,df1,df2))
+# print(DataManager.dm.unitPrice(DataManager.dm,df2))
+
 im = ims(logo, 1*inch, 0.5*inch)
 Story.append(im)
 styles=getSampleStyleSheet()
@@ -90,8 +92,48 @@ Story.append(Spacer(1, 12))
 Story.append(t)
 Story.append(Spacer(1, 12))
 
+dataDict = DataManager.dm.btn_Invoice(DataManager.dm,df1,df2)
+key_list = list(dataDict.keys())
+tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+td = Table(tableData,style = [  ('BACKGROUND', (0, 0), (-1,-1), '#D2D2D2'),
+                                ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                ('FONTSIZE', (0,0), (-1,-1),15),
+                                ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                    rowHeights=0.4*inch)
+Story.append(td)
+for i in key_list:
+    tableData = [[str(i),'','','','']]
+    # tableData = tableData +[[str(i)]]
+    tableData = tableData + dataDict[i]
+    nwSum = 0
+    totalSum = 0
+    for j in dataDict[i]:
+        nwSum += float(j[-3])
+        totalSum += float(j[-1])
+    # print(round(nwSum, 2),round(totalSum, 2))
+    tableData = tableData + [[str(i)+' Total','','',round(nwSum, 2),'',round(totalSum, 2)]]
+    td = Table(tableData,style = [  ('SPAN', (0,0), (-1,0)),
+                                    ('SPAN', (0,-1), (2,-1)),
+                                    ('BACKGROUND', (0,-1), (2,-1), '#D2D2D2'),
+                                    ('BACKGROUND', (4,-1), (4,-1), '#D2D2D2'),
+                                    ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                    ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                    # ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                    ('FONTSIZE', (0,0), (-1,-1),16)
+                                    ],colWidths=[0.5*inch,0.7*inch,2.5*inch,0.7*inch,1.2*inch,1.2*inch],
+                                    rowHeights=0.4*inch)
+    Story.append(td)
+# Story.append(td)
+Story.append(Spacer(1, 12))
+
 doc.build(Story)
-print('CP')
+# print('CP')
 ##########################################################
 # from reportlab.lib import colors
 # from reportlab.lib.pagesizes import LETTER, inch, portrait

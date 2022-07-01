@@ -483,15 +483,19 @@ class dm():
         image_list[0].save('Customer_pages.pdf', save_all=True, append_images=image_list[1:])
         print('Customer page complete')
     
-    def unitPrice(self,customer_df):
-        product_price = {}
-        for index,row in customer_df[['Item Code','Item Price']].drop_duplicates(keep='first').iterrows(): 
-            product_price[row['Item Code']] = row['Item Price']
-        return product_price
+    # def unitPrice(self,customer_df):
+    #     product_price = {}
+    #     for index,row in customer_df[['Item Code','Item Price']].drop_duplicates(keep='first').iterrows(): 
+    #         product_price[row['Item Code']] = row['Item Price']
+    #     return product_price
     
     def btn_Invoice(self,product_df,customer_df):      #total USD
         use_df = product_df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
-        product_price = self.unitPrice(customer_df)
+        # product_price = self.unitPrice(customer_df)
+        product_price = {}
+        for index,row in customer_df[['Item Code','Item Price']].drop_duplicates(keep='first').iterrows(): 
+            product_price[row['Item Code']] = row['Item Price']
+            
         for index, row in use_df.iterrows():    #calculate weight
             net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
             if len(net_weight.split('.')[-1]) >1:
@@ -518,7 +522,6 @@ class dm():
             for n in range(len(new_df.index)): numlist.append(n+1)
             new_df.insert(0,'No',numlist)
             df_dict[product] = new_df.values.tolist()
-        print(df_dict)
         return df_dict
     
     # def btn_PackingList(self,df):      #Packing
