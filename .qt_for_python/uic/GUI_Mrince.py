@@ -456,7 +456,7 @@ class Ui_MainWindow(object):
         self.pushButton_6.setText(_translate("MainWindow", "Durian Order"))
         self.pushButton_4.setText(_translate("MainWindow", "Station Shopping"))
         self.pushButton_8.setText(_translate("MainWindow", "Customer Barcode"))
-        self.label_9.setText(_translate("MainWindow", "Need Export by Product"))
+        self.label_9.setText(_translate("MainWindow", "Need Export by Customer"))
         self.pushButton_2.setText(_translate("MainWindow", "Upload Export By Customer"))
         self.label_7.setText(_translate("MainWindow", "Need Export by Product"))
         self.pushButton_9.setText(_translate("MainWindow", " Export By Product"))

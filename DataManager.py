@@ -228,10 +228,8 @@ class dm():
     def new_Durian_crate(self,newdf):
         Customer_df = newdf
         Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']   #ลังใหญ่, ลังเล็ก, กล่อง, ภูเขาไฟกล่องเดียว, ก้านยาวกล่องเดี่ยว
-        # col_one_list = list(set(Customer_df['Item Code'].tolist()))
-        # col_one_list = sorted(col_one_list)
         
-        # print(col_one_list)
+        print(Customer_df)
         
         Customer_durian_df = Customer_df.loc[Customer_df['Item Code'].isin(Durian_SKU)][['No.','Customer Name','Item Code','Item Name','Item Qty']]
         for index, row in Customer_durian_df.iterrows():

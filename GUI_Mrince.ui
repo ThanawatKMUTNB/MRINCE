@@ -441,7 +441,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Need Export by Product</string>
+       <string>Need Export by Customer</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

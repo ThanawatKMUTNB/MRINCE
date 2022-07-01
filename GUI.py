@@ -95,7 +95,7 @@ class Ui(QtWidgets.QMainWindow):
         self.label_8.setText("Need Export by Product")
         self.label_8.setStyleSheet("color : black")
         
-        self.label_9.setText("Need Export by Product")
+        self.label_9.setText("Need Export by Customer")
         self.label_9.setStyleSheet("color : black")
         
         self.label_10.setText("Need Export by Product")
@@ -132,10 +132,10 @@ class Ui(QtWidgets.QMainWindow):
     
     def getDurianCrate(self): #4
         sdm = DataManager.dm()
-        if self.ExportByProductPath != "":
+        if self.ExportByCustomerPath != "":
             self.label_9.setText("Waiting...")
             self.label_9.setStyleSheet("color : red;")
-            sdm.new_Durian_crate_PDF(self.ExportByProductTable,self.ExportByProductPath)
+            sdm.new_Durian_crate_PDF(self.ExportByCustomerTable,self.ExportByCustomerPath)
             self.label_9.setText("Compleate")
             self.label_9.setStyleSheet("color : green;")
     
