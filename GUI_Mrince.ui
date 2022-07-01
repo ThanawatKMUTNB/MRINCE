@@ -119,7 +119,7 @@
        </font>
       </property>
       <property name="text">
-       <string>btn_PackingSummary</string>
+       <string>Packing Summary</string>
       </property>
      </widget>
     </item>
@@ -212,7 +212,7 @@
        </font>
       </property>
       <property name="text">
-       <string>btn_Invoice</string>
+       <string>Invoice</string>
       </property>
      </widget>
     </item>
@@ -809,7 +809,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string/>
+       <string>Need Export by Product / Customer</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

@@ -518,6 +518,7 @@ class dm():
             for n in range(len(new_df.index)): numlist.append(n+1)
             new_df.insert(0,'No',numlist)
             df_dict[product] = new_df.values.tolist()
+        print(df_dict)
         return df_dict
     
     # def btn_PackingList(self,df):      #Packing

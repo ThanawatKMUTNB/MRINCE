@@ -47,18 +47,21 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_7.clicked.connect(self.getParcelCover) #5
         self.pushButton_7.setStyleSheet("background-color : #6C88C4;color : white")
         
-        self.pushButton_11.clicked.connect(self.getParcelCover_3Copy) #5*3
-        self.pushButton_11.setStyleSheet("background-color : #C05780;color : white")
-        
-        
         self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
         self.pushButton_9.setStyleSheet("background-color : #00A5E3 ;color : white")
         
         self.pushButton_8.clicked.connect(self.CustomerProduct) #7
         self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
         
+        self.pushButton_14.setStyleSheet("background-color : #8AAB93 ;color : white") #8
+        self.pushButton_14.clicked.connect(self.getInvoice)
+        
+        self.pushButton_11.clicked.connect(self.getParcelCover_3Copy) #10 #5*3
+        self.pushButton_11.setStyleSheet("background-color : #C05780;color : white")
+        
         self.pushButton_10.setStyleSheet("background-color : #FF5768 ;color : white")
-        self.pushButton_10.clicked.connect(self.clearAll) #7
+        self.pushButton_10.clicked.connect(self.clearAll) #11
+        
         # font-size: 24px;
         # self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
         # self.CustomerProductBT.clicked.connect(self.CustomerProduct)
@@ -103,6 +106,9 @@ class Ui(QtWidgets.QMainWindow):
         
         self.label_11.setText("Need Export by Customer")
         self.label_11.setStyleSheet("color : black")
+        
+        self.label_12.setText("Need Export by Product / Customer")
+        self.label_12.setStyleSheet("color : black")
         
         self.lineEdit.clear()
         
@@ -168,7 +174,23 @@ class Ui(QtWidgets.QMainWindow):
             sdm.Customer_product(self.ExportByCustomerTable)
             self.label_6.setText("Compleate")
             self.label_6.setStyleSheet("color : green;")
-            
+    
+    def getInvoice(self): #8
+        sdm = DataManager.dm()
+        if self.ExportByCustomerPath != "" and self.ExportByProductPath != "":
+            self.label_12.setText("Waiting...")
+            self.label_12.setStyleSheet("color : red;")
+            sdm.btn_Invoice(self.ExportByProductTable,self.ExportByCustomerTable)
+            self.label_12.setText("Compleate")
+            self.label_12.setStyleSheet("color : green;")
+    
+    def getParcelCover_3Copy(self): #10
+        sdm = DataManager.dm()
+        try:
+            sdm.Order_label(self.ExportByCustomerTable)
+        except :
+            pass
+        
     def getPathExportByProduct(self):
         sdm = DataManager.dm()
         try:
@@ -184,14 +206,6 @@ class Ui(QtWidgets.QMainWindow):
             # self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
             self.label_2.setText("Compleate")
             self.label_2.setStyleSheet("color : green")
-        except :
-            pass
-        
-    def getParcelCover_3Copy(self): #5
-        sdm = DataManager.dm()
-        try:
-            Max = int(self.lineEdit.text())
-            sdm.Order_label(self.ExportByCustomerTable)
         except :
             pass
         

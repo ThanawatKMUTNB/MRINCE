@@ -1,7 +1,99 @@
-x = [1,2,3,4]
-print(x[-2])
-#########
-# # from reportlab.lib import colors
+##########################################################
+import time
+import pandas as pd
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.pagesizes import letter,A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import Image as ims
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+
+from datetime import date
+
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib import colors
+
+import DataManager
+
+today = date.today()
+doc = SimpleDocTemplate("Invoic.pdf",pagesize=A4,
+                        rightMargin=72,leftMargin=150,
+                        topMargin=72,bottomMargin=18)
+pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+
+Story=[]
+logo = "Phase1\src\logo-web.png"
+paperHead = '<b>Invoic</b>'
+noByDate = 'No '+str(today.strftime("%Y%m%d"))
+DateToday = 'Date '+str(today.strftime("%d %B %Y"))
+textExpH = 'Exporter...'
+textImpH = 'Importer...'
+textExp = ['1','2','3','4','5','6','7']
+textImp = ['1','2','3','4','5','6','']
+
+adressData = [[textExpH,textImpH]]
+for i,s in zip(textExp,textImp):
+    adressData.append(['    '+i,'   '+s])
+
+t = Table(adressData,style = [  ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                ('FONTSIZE', (0,0), (-1,-1),12)
+                                ],colWidths=[285,285])
+df1 = pd.read_csv('Phase1\Order_Items_Export_-_2022-06-20.csv')
+df2 = pd.read_csv('orders-2022-06-20-00-16-07.csv')
+print(DataManager.dm.btn_Invoice(DataManager.dm,df2,df1))
+im = ims(logo, 1*inch, 0.5*inch)
+Story.append(im)
+styles=getSampleStyleSheet()
+# styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+styles.add(ParagraphStyle(name='Normal_CENTER',
+                          parent=styles['Normal'],
+                          fontName='THSarabunNew',
+                          alignment=TA_CENTER,
+                          fontSize=20,
+                          leading=13,
+                          textColor=colors.black,
+                          borderPadding=0,
+                          leftIndent=0,
+                          rightIndent=0,
+                          spaceAfter=0,
+                          spaceBefore=0,
+                          splitLongWords=True,
+                          spaceShrinkage=0.05,
+                          ))
+styles.add(ParagraphStyle(name='Normal_Right',
+                          parent=styles['Normal'],
+                          fontName='THSarabunNew',
+                          alignment=TA_RIGHT,
+                          fontSize=20,
+                          leading=13,
+                          textColor=colors.black,
+                          borderPadding=0,
+                          leftIndent=0,
+                          rightIndent=0,
+                          spaceAfter=0,
+                          spaceBefore=0,
+                          splitLongWords=True,
+                          spaceShrinkage=0.05,
+                          ))
+Story.append(Paragraph(paperHead, styles["Normal_CENTER"]))
+Story.append(Spacer(1, 12))
+
+Story.append(Paragraph(noByDate, styles["Normal_Right"]))
+Story.append(Spacer(1, 12))
+
+Story.append(Paragraph(DateToday, styles["Normal_Right"]))
+Story.append(Spacer(1, 12))
+
+Story.append(t)
+Story.append(Spacer(1, 12))
+
+doc.build(Story)
+print('CP')
+##########################################################
+# from reportlab.lib import colors
 # from reportlab.lib.pagesizes import LETTER, inch, portrait
 # from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 # from reportlab.lib.styles import getSampleStyleSheet
