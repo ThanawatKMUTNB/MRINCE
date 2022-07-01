@@ -437,51 +437,29 @@ class dm():
         print("OrderLabel Complete")
     
     def ExportDupCSV(self,df,dfPath):   #6
-        try:
-            self.ExportByProductTable = df
-            self.ExportByProductPath = dfPath
-            cols = list(self.ExportByProductTable.columns.values)
-            if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
-                # self.ExportByCustomerTable
-                file_location = self.ExportByProductPath
-                # print(file_location)
-                file_name = os.path.basename(file_location)
-                # print(file_name)
-                newPath = dfPath
-                # newPath = file_location.replace(file_name, "Cleared_"+file_name)
-                # self.label_5.setText(newPath)
-                # self.ExportByProductTable.to_csv(newPath, index=False)
-                # print(newPath)
-                
-                pdfPath = newPath.replace(".csv",".pdf")
-                col_one_list = list(set(df['Product Categories'].tolist()))
-                # print(col_one_list)
-                # col_one_list = col_one_list.sort()1
-                elements = []
-                # print(col_one_list)
-                for i in col_one_list:
-                    print(i)
-                    rslt_df = df.loc[df['Product Categories'] == i]
-                    rslt_df = rslt_df.sort_values(by=['Product ID'])
-                    ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
-                    # doc = SimpleDocTemplate(pdfPath, pagesize=A4)
-                    doc = SimpleDocTemplate(pdfPath,pagesize=A4,
-                        rightMargin=18,leftMargin=18,
-                        topMargin=18,bottomMargin=18)
-                    # styleSheet = getSampleStyleSheet()
-                    data = ListOfList
-                    pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
-                    t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
-                                        ('FONTSIZE', (0,0), (-1,-1),14)
-                                        ])
-                    
-                    elements.append(t)
-                    elements.append(PageBreak())
-                doc.build(elements) 
-        except :
-            pass
+        cols = list(df.columns.values)
+        if cols == ['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']:
+            pdfPath = dfPath
+            col_one_list = list(set(df['Product Categories'].tolist()))
+            elements = []
+            for i in col_one_list:
+                rslt_df = df.loc[df['Product Categories'] == i]
+                rslt_df = rslt_df.sort_values(by=['Product ID'])
+                ListOfList = [list(rslt_df.columns)] + rslt_df.values.tolist()
+                doc = SimpleDocTemplate(pdfPath,pagesize=A4,
+                    rightMargin=18,leftMargin=18,
+                    topMargin=18,bottomMargin=18)
+                # styleSheet = getSampleStyleSheet()
+                data = ListOfList
+                pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+                t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                    ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                    ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                    ('FONTSIZE', (0,0), (-1,-1),14)
+                                    ])
+                elements.append(t)
+                elements.append(PageBreak())
+            doc.build(elements)
     
     def Customer_product(self,newdf):     #7
         # newdf = self.ExportByCustomerTable

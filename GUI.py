@@ -1,8 +1,10 @@
 import csv
 from email.policy import strict
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic,QtGui
 import sys
 import os
+# import QtGui
+from numpy import save
 import DataManager
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QPushButton, QFileDialog, QVBoxLayout
@@ -84,7 +86,7 @@ class Ui(QtWidgets.QMainWindow):
         self.label_5.setText("Need Export by Product")
         self.label_5.setStyleSheet("color : black")
         
-        self.label_6.setText("Need Export by Product")
+        self.label_6.setText("Need Export by Customer")
         self.label_6.setStyleSheet("color : black")
         
         self.label_7.setText("Need Export by Product")
@@ -98,6 +100,9 @@ class Ui(QtWidgets.QMainWindow):
         
         self.label_10.setText("Need Export by Product")
         self.label_10.setStyleSheet("color : black")
+        
+        self.label_11.setText("Need Export by Customer")
+        self.label_11.setStyleSheet("color : black")
         
         self.lineEdit.clear()
         
@@ -170,9 +175,10 @@ class Ui(QtWidgets.QMainWindow):
             self.label_2.setText("No choose file")
             self.label_2.setStyleSheet("color : red")
             self.ExportByProductPath = self.launchDialog()
-            self.label.setText(self.ExportByProductPath)
             sdm.setdf(self.ExportByProductPath)
             self.ExportByProductTable = sdm.sort()
+            self.ExportByProductTable = self.ExportByProductTable[['Product ID', 'Product Name', 'Line Item Quantity', 'Product SKU', 'Product Categories']]
+            self.label.setText(self.ExportByProductPath)
             model = PandasModel.PandasModel(self.ExportByProductTable)
             self.tableView.setModel(model)
             # self.label_2.setText("Count : "+str(len(self.ExportByProductTable)))
@@ -185,13 +191,15 @@ class Ui(QtWidgets.QMainWindow):
         sdm = DataManager.dm()
         try:
             Max = int(self.lineEdit.text())
-            sdm.Cover_3Copy(Max)
+            sdm.Order_label(self.ExportByCustomerTable)
         except :
             pass
         
     def getPathExportByCustomer(self):
         sdm = DataManager.dm()
         try:
+            self.label_3.setText("No choose file")
+            self.label_3.setStyleSheet("color : red")
             
             self.ExportByCustomerPath = self.launchDialog()
             self.label_4.setText(self.ExportByCustomerPath)
@@ -212,6 +220,7 @@ class Ui(QtWidgets.QMainWindow):
         option = self.options.index('Save File Name')
         # print(self.combo.currentText())
         response = ''
+        print(option)
         if option == 0:
             response = self.getFileName()
         elif option == 1:
@@ -280,18 +289,19 @@ class Ui(QtWidgets.QMainWindow):
             caption='Select a folder'
         )
         return response 
-
-    def getSaveFileName(self):
         
-        file_filter = 'Data File (*.csv);; Excel File (*.xlsx *.xls)'
+    def getSaveFileName(self):
+        self.saveFileName = self.ExportByProductPath.replace(".csv",".pdf")
+        file_filter = 'PDF (*.pdf);'
         response = QFileDialog.getSaveFileName(
             parent=self,
             caption='Select a data file',
-            directory= os.path.basename(self.ExportByProductPath),
+            directory = os.path.basename(self.saveFileName),
             filter=file_filter,
-            initialFilter='Excel File (*.csv)'
+            initialFilter='PDF (*.pdf);'
         )
-        print(response)
+        # print('response ',response)
+        # print('response 0 ',response[0])
         return response[0]
     
         
