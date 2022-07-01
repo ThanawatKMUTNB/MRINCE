@@ -542,8 +542,8 @@ class dm():
         paperHead = '<b>Invoic</b>'
         noByDate = 'No '+str(today.strftime("%Y%m%d"))
         DateToday = 'Date '+str(today.strftime("%d %B %Y"))
-        textExpH = 'Exporter...'
-        textImpH = 'Importer...'
+        textExpH = 'Exporter'
+        textImpH = 'Importer'
         textExp = ['Ince TH Trade Co.,Ltd.',
                    '37/346 M.7 Klong2 KlongLoung',
                    'Pathum Thani 12120',
@@ -665,8 +665,8 @@ class dm():
         logo = "Phase1\src\logo-web.png"
         paperHead = '<b>Invoic</b>'
         noByDate = 'Ref No : '+str(today.strftime("%Y%m%d"))
-        textExpH = 'Exporter...'
-        textImpH = 'Importer...'
+        textExpH = 'Exporter'
+        textImpH = 'Importer'
         textExp = ['Ince TH Trade Co.,Ltd.',
                    '37/346 M.7 Klong2 KlongLoung',
                    'Pathum Thani 12120',
