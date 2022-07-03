@@ -3,7 +3,14 @@ from PyQt5.QtWidgets import QFileDialog, QHeaderView
 import pandas as pd
 import textwrap
 from report import Ui_ReportWindow
-
+from reportlab.platypus import SimpleDocTemplate,Paragraph, Spacer, Table
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
 import sys
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -376,7 +383,44 @@ class Ui_MainWindow(object):
 
         self.report_window.show()
         
-
+    def PDF_report(self,ListOfList):
+        custumerName = self.customer_name.text()
+        doc = SimpleDocTemplate(str(custumerName)+".pdf",pagesize=A4,
+                                rightMargin=100,leftMargin=100,
+                                topMargin=20,bottomMargin=20)
+        pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+        Story=[]
+        styles=getSampleStyleSheet()
+        # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+        styles.add(ParagraphStyle(name='Normal',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_LEFT,
+                                fontSize=16,
+                                leading=0,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        Story.append(Paragraph('Custumer Name : '+custumerName, styles["Normal"]))
+        Story.append(Spacer(1, 12))
+        td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
+                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                        ('FONTSIZE', (0,0), (-1,-1),15),
+                                        ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                        ],colWidths=[1*inch,4*inch,1*inch,1*inch],
+                                            rowHeights=0.4*inch)
+        Story.append(td)
+        doc.build(Story)
+        
 if __name__ == '__main__':
     import sys
 
