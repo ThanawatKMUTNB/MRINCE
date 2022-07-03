@@ -146,14 +146,12 @@ class Ui_MainWindow(object):
         font.setPointSize(14)
         self.table.setFont(font)
         self.table.setObjectName("tableWidget")
-        self.table.setColumnCount(3)
+        self.table.setColumnCount(4)
         self.table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.table.setHorizontalHeaderItem(2, item)
+        self.table.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem())
+        self.table.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem())
+        self.table.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem())
+        self.table.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem())
         self.table.horizontalHeader().setVisible(True)
         self.table.horizontalHeader().setCascadingSectionResizes(False)
         self.table.horizontalHeader().setSortIndicatorShown(False)
@@ -194,11 +192,11 @@ class Ui_MainWindow(object):
         self.item_ID.returnPressed.connect(self.add_item)
 
         # table
-        self.table.setColumnCount(3)
         header = self.table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         # sub window
         self.report_window = QtWidgets.QMainWindow()
@@ -227,10 +225,12 @@ class Ui_MainWindow(object):
         self.add_btn.setText(_translate("MainWindow", "เพิ่ม"))
         self.sub_btn.setText(_translate("MainWindow", "ลด"))
         item = self.table.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "สินค้า"))
+        item.setText(_translate("MainWindow", "SKU"))
         item = self.table.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "จำนวนที่สั่ง"))
+        item.setText(_translate("MainWindow", "สินค้า"))
         item = self.table.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "จำนวนที่สั่ง"))
+        item = self.table.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "จำนวนที่ได้"))
         self.clearBtn.setText(_translate("MainWindow", "Clear"))
 
@@ -276,9 +276,10 @@ class Ui_MainWindow(object):
         self.table.setRowCount(0)
         self.table.setRowCount(self.order_list.shape[0])
         for index, row in self.order_list.iterrows():
-            self.table.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
-            self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
-            self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
+            self.table.setItem(index, 0 ,QtWidgets.QTableWidgetItem(str(row['Item Code'])))
+            self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
+            self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
+            self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
 
     def clear_data(self) -> None:
         self.table.setRowCount(0)
