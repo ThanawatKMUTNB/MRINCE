@@ -210,7 +210,7 @@ class Ui_MainWindow(object):
         self.report_ui = Ui_ReportWindow()
         self.report_ui.setupUi(self.report_window)
 
-        self.report_ui.pushButton.clicked.connect(lambda: print(self.get_order_list()))
+        self.report_ui.pushButton.clicked.connect(self.PDF_report)
 
         # set up variable
         self.changeMode(True)
@@ -320,21 +320,27 @@ class Ui_MainWindow(object):
             self.sub_btn.setStyleSheet("background-color : Red")
 
     def add_item(self) -> None:
+        print('start add item funcion')
         item_ID = self.item_ID.text()
         self.item_ID.clear()
-        if (item_ID == "") or (len(item_ID) != 13) or not (item_ID.isnumeric()):
+        if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())):
             return
         SKU = self.readbarcode(item_ID)
+        print(f'SKU : {SKU}')
         found = False
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
+                print('SKU found in order list')
                 if self.add_mode:
+                    print('add item')
                     self.order_list.loc[index,'ItemGet'] += 1
                 elif self.order_list.loc[index,'ItemGet'] >0:
+                    print('sub item')
                     self.order_list.loc[index,'ItemGet'] -= 1
                 found = True
                 break
         if not found:
+            print('no SKU fount in order list -> Add new order')
             item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
             row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1}
             self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
@@ -397,7 +403,8 @@ class Ui_MainWindow(object):
 
         self.report_window.show()
         
-    def PDF_report(self,ListOfList):
+    def PDF_report(self):
+        ListOfList = self.get_order_list()
         custumerName = self.customer_name.text()
         doc = SimpleDocTemplate(str(custumerName)+".pdf",pagesize=A4,
                                 rightMargin=100,leftMargin=100,
@@ -406,7 +413,7 @@ class Ui_MainWindow(object):
         Story=[]
         styles=getSampleStyleSheet()
         # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
-        styles.add(ParagraphStyle(name='Normal',
+        styles.add(ParagraphStyle(name='Normals',
                                 parent=styles['Normal'],
                                 fontName='THSarabunNew',
                                 alignment=TA_LEFT,
@@ -421,7 +428,8 @@ class Ui_MainWindow(object):
                                 splitLongWords=True,
                                 spaceShrinkage=0.05,
                                 ))
-        Story.append(Paragraph('Custumer Name : '+custumerName, styles["Normal"]))
+        Story.append(Paragraph('Custumer Name : '+custumerName, styles["Normals"]))
+        Story.append(Spacer(1, 12))
         Story.append(Spacer(1, 12))
         td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
                                         ('FONT', (0,0), (-1,-1),('THSarabunNew')),
