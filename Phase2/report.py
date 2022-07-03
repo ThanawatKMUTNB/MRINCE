@@ -56,10 +56,6 @@ class Ui_ReportWindow(object):
         font.setPointSize(16)
         item.setFont(font)
         self.tableWidget_1.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        item.setFont(font)
         self.tableWidget_1.setHorizontalHeaderItem(1, item)
         self.verticalLayout.addWidget(self.tableWidget_1)
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
@@ -86,8 +82,6 @@ class Ui_ReportWindow(object):
         font.setPointSize(16)
         item.setFont(font)
         self.tableWidget_2.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        item.setFont(font)
         self.tableWidget_2.setHorizontalHeaderItem(1, item)
         self.verticalLayout.addWidget(self.tableWidget_2)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
@@ -99,6 +93,20 @@ class Ui_ReportWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        # table
+        header = self.tableWidget_1.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
+        header = self.tableWidget_2.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+
+        fnt = self.tableWidget_1.font()
+        fnt.setPointSize(16)
+        self.tableWidget_1.setFont(fnt)
+        self.tableWidget_2.setFont(fnt)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)

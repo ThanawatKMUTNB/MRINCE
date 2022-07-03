@@ -80,6 +80,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
         <property name="columnCount">
          <number>2</number>
         </property>
@@ -131,6 +136,11 @@
       </item>
       <item>
        <widget class="QTableWidget" name="tableWidget_2">
+        <property name="font">
+         <font>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
         <property name="showGrid">
          <bool>true</bool>
         </property>
