@@ -210,6 +210,8 @@ class Ui_MainWindow(object):
         self.report_ui = Ui_ReportWindow()
         self.report_ui.setupUi(self.report_window)
 
+        self.report_ui.pushButton.clicked.connect(lambda: print(self.get_order_list()))
+
         # set up variable
         self.changeMode(True)
         self.ID = None
@@ -287,6 +289,18 @@ class Ui_MainWindow(object):
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
+
+    def get_order_list(self) -> list:
+        LIST = []
+        LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้'])
+        for index, row in self.order_list.iterrows():
+            ROW = []
+            ROW.append(str(row['Item Code']))
+            ROW.append(str(row['Item Name']))
+            ROW.append(str(row['Item Qty']))
+            ROW.append(str(row['ItemGet']))
+            LIST.append(ROW)
+        return LIST
 
     def clear_data(self) -> None:
         self.table.setRowCount(0)
