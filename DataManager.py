@@ -298,7 +298,7 @@ class dm():
             elements.append(t)
             
             Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']
-            cr = ['#FF458F','#FTA_CENTERF8352','#DEE500','#00E1DF','#00C3AF']
+            cr = ['#FF458F','#FF8352','#DEE500','#00E1DF','#00C3AF']
             pn = ['ทุเรียนแกะหมอนทอง (ลังเล็ก) (6000 กรัม)',
                   'ทุเรียนแกะหมอนทอง (ลังใหญ่) (12000 กรัม)',
                   'ทุเรียนกล่อง (เดี่ยว) (500 กรัม)',
@@ -367,7 +367,6 @@ class dm():
                                         ],colWidths=[1*inch,1*inch,4*inch,1*inch], 
                                         rowHeights=[1*inch]+[0.5*inch]*(len(ListofNo)+1))
                 elements.append(t)
-            #     # elements.append(PageBreak())
             doc.build(elements) 
         # except :
         #     pass
