@@ -40,6 +40,7 @@ class Ui(QtWidgets.QMainWindow):
         
         #3
         self.pushButton_5.setStyleSheet("background-color : #0065A2;color : white")
+        self.pushButton_5.clicked.connect(self.getProductLabel) 
         
         self.pushButton_6.clicked.connect(self.getDurianCrate) #4
         self.pushButton_6.setStyleSheet("background-color : #FFBF65;color : white")
@@ -141,6 +142,14 @@ class Ui(QtWidgets.QMainWindow):
             self.label_10.setStyleSheet("color : green;")
             
     #3
+    def getProductLabel(self): #1
+        sdm = DataManager.dm()
+        if self.ExportByProductPath != "":
+            self.label_8.setText("Waiting...")
+            self.label_8.setStyleSheet("color : red;")
+            sdm.Product_label(self.ExportByProductTable)
+            self.label_8.setText("Compleate")
+            self.label_8.setStyleSheet("color : green;")
     
     def getDurianCrate(self): #4
         sdm = DataManager.dm()
