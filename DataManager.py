@@ -146,8 +146,8 @@ class dm():
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
             self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
-            code = code.resize((int(width/2),int(height/4)))
-            img.paste(code,(int(width*(1/3)),int(height*(1/2))))
+            code = code.resize((int(width/1.1),int(height/3.5)))
+            img.paste(code,(int(width*(1/14)),int(height*(1/2))))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
@@ -176,29 +176,35 @@ class dm():
         image_list[0].save('Product_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Product type Complete")
     
-    def Product_label(self):    #3 filter veg and fruits
-        filter_values = ['ผัก','ผลไม้']
-        newdf = self.df.loc[~self.df['Product Categories'].isin(filter_values)]
-        # width = 400
-        # height = 250
-        # fonts = ImageFont.truetype(self.font, size=20)
-        # image_list = []
-        # for index, row in newdf.iterrows():
-        #     product = row['Product Name']
-        #     product_name = product.split('(')[0]
-        #     product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
-        #     product_sku = row['Product SKU']
-        #     img = PIL.Image.new('RGB', (width, height), color='white')
-        #     ImageDraw.Draw(img)       
-        #     text_color = (0,0,0)   #black
-        #     self.draw_multiple_line_text(img, product_weight, fonts, text_color, height*(2/10))
-        #     self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(3/10))
-        #     self.draw_multiple_line_text(img, product_sku, fonts, text_color, height*(4/10))
-        #     code = self.createbarcode(product_sku)
-        #     code = code.resize((int(width/3),int(height/4)))
-        #     img.paste(code,(int(width*(1/3)),int(height*(1/2))))
-        #     subloop = int(row['Line Item Quantity'])
-        #     for copy in range(subloop): image_list.append(img.convert('RGB'))
+    def Product_label(self,df):    #3 filter veg and fruits
+        width = 400
+        height = 300
+        fonts = ImageFont.truetype(self.font, size=20)
+        image_list = []
+        df.sort_values(by=['Product Name'],inplace=True)
+        for index, row in df.iterrows():
+            if (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
+            product = row['Product Name']
+            product_name = row['Product Name'].split('(')
+            if len(product_name) > 2:
+                product_name.pop()
+                product_name = "".join(product_name)[:-2]
+            else: product_name = product_name[0][:-1]
+            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            product_sku = row['Product SKU']
+            img = PIL.Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)       
+            text_color = (0,0,0)   #black
+            self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
+            self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
+            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width/1.1),int(height/3.5)))
+            img.paste(code,(int(width*(1/14)),int(height*(1/2))))
+            subloop = int(row['Line Item Quantity'])
+            for copy in range(subloop): image_list.append(img.convert('RGB'))
+        image_list[0].save('FoodBarcode_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("Food Barcode Complete")
     
     def Durian_crate(self,df):     #4
         Durian_ID = [7576,7562,7564,8140,8216]    #กล่อง ,ลังเล็ก, ลังใหญ่, ก้านยาวกล่องเดี่ยว, ภูเขาไฟกล่องเดียว
@@ -298,7 +304,7 @@ class dm():
             elements.append(t)
             
             Durian_SKU = ['FT0011','FT0012','FT0015','FT0035','FT0480']
-            cr = ['#FF458F','#FTA_CENTERF8352','#DEE500','#00E1DF','#00C3AF']
+            cr = ['#FF458F','#FF8352','#DEE500','#00E1DF','#00C3AF']
             pn = ['ทุเรียนแกะหมอนทอง (ลังเล็ก) (6000 กรัม)',
                   'ทุเรียนแกะหมอนทอง (ลังใหญ่) (12000 กรัม)',
                   'ทุเรียนกล่อง (เดี่ยว) (500 กรัม)',
@@ -367,7 +373,6 @@ class dm():
                                         ],colWidths=[1*inch,1*inch,4*inch,1*inch], 
                                         rowHeights=[1*inch]+[0.5*inch]*(len(ListofNo)+1))
                 elements.append(t)
-            #     # elements.append(PageBreak())
             doc.build(elements) 
         # except :
         #     pass
