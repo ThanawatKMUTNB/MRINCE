@@ -183,6 +183,7 @@ class Ui_MainWindow(object):
         self.end_button.clicked.connect(self.show_report_window)
         self.add_btn.clicked.connect(lambda : self.changeMode(True))
         self.sub_btn.clicked.connect(lambda : self.changeMode(False))
+        self.clearBtn.clicked.connect(self.clear_data)
 
         # Label
         self.status.setText('สถานะ : ไม่พร้อม')
@@ -301,6 +302,7 @@ class Ui_MainWindow(object):
         self.item_ID.clear()
         self.customer_name.clear()
         self.cus_ID.clear()
+        self.employee_name.clear()
         self.order_list = pd.DataFrame()
 
     def changeMode(self, add):
@@ -415,7 +417,7 @@ class Ui_MainWindow(object):
         doc = SimpleDocTemplate(str(custumerName)+".pdf",pagesize=A4,
                                 rightMargin=100,leftMargin=100,
                                 topMargin=20,bottomMargin=20)
-        pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+        pdfmetrics.registerFont(TTFont('THSarabunNew', './src/THSarabunNew.ttf'))
         Story=[]
         styles=getSampleStyleSheet()
         # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
