@@ -77,7 +77,7 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
-    def draw_multiple_line_text2(image, text, font, text_color, text_start_height,start_width):
+    def draw_multiple_line_text2(self,image, text, font, text_color, text_start_height,start_width):
         draw = ImageDraw.Draw(image)
         image_width, image_height = image.size
         y_text = text_start_height
