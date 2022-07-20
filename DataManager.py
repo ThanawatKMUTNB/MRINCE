@@ -76,6 +76,17 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
+    def draw_multiple_line_text2(image, text, font, text_color, text_start_height,start_width):
+        draw = ImageDraw.Draw(image)
+        image_width, image_height = image.size
+        y_text = text_start_height
+        lines = textwrap.wrap(text, width=32)
+        for line in lines:
+            line_width, line_height = font.getsize(line)
+            draw.text((start_width, y_text), 
+                    line, font=font, fill=text_color)
+            y_text += line_height
+    
     def draw_multiple_line_text_barcode(self,image, text, font, text_color, text_start_height):
         draw = ImageDraw.Draw(image)
         image_width, image_height = image.size
@@ -421,24 +432,31 @@ class dm():
         print("Amount Complete")
     
     def Order_label(self,customer_df):
-        width = 4*100
-        height = 4*75
+        width = 5*90
+        height = 5*60
         image_list = []
-        no_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=90)
-        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=30)
-        logo = Image.open(os.path.join("src","LogoBW.png"))
+        no_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=80)
+        name_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=20)
+        address_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=10)
+        logo = Image.open("../src/LogoBW.png")
+        customer_df = pd.read_csv("../../orders-2022-06-20-00-16-07.csv")
+        #Max = int(input("Enter max number: "))
         order_id = {}
         for index, row in customer_df.iterrows():
             if not row['No.'] in order_id: order_id[row['No.']] = row['Customer Name']
-        text_color = (0,0,0)
+
         for no in order_id:
             customer_name = order_id[no]
             text_color = (0,0,0)
+            barcode = self.createbarcode(str(no)).resize((int(width/2),int(height/6)))
             img = Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
-            self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text(img, customer_name, name_fonts, text_color, height*(7/10))
-            img.paste(logo,(int(width/2.7),50))
+            self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(1.2/10))
+            self.draw_multiple_line_text(img, customer_name, name_fonts, text_color, height*(4.5/10))
+            self.draw_multiple_line_text2(img, "Exporter : Ince TH Trade Co.,Ltd 37/346 M.7 Klong2 KlongLoung Pathum Thani 12120", address_fonts, text_color, height*(6/10),width/8)
+            self.draw_multiple_line_text2(img, "Importer : Ince UK limited 7 Blackstock Road London N4 2JF", address_fonts, text_color, height*(6/10),width/1.8)
+            img.paste(logo,(int(width/2.7),7))
+            img.paste(barcode,(int(width/4),int(height/1.3)))    
             for copy in range(3): image_list.append(img.convert('RGB'))
         image_list[0].save('OrderLabel_pages.pdf', save_all=True, append_images=image_list[1:])
         print("OrderLabel Complete")
