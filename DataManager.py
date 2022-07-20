@@ -13,14 +13,15 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib as mpl
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, inch
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, PageBreak, PageTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import PageBreak
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.platypus.frames import Frame
 from reportlab.platypus import Image as ims
+from functools import partial
 from reportlab.platypus import Spacer
 
 class dm():
@@ -675,14 +676,48 @@ class dm():
         Story.append(Spacer(1, 12))
 
         doc.build(Story)
+    
+    def footer(self,canvas, doc, content):
+        canvas.saveState()
+        w, h = content.wrap(doc.width, doc.bottomMargin)
+        # print(doc.bottomMargin)
+        # print(type(doc.bottomMargin))
         
-    def packingSumPDF(self,dfProduct):
+        content.drawOn(canvas, doc.leftMargin, h+20)
+        canvas.restoreState()
+
+    def header_and_footer(self,canvas, doc, footer_content):
+        self.footer(canvas, doc, footer_content)
+        
+    def  packingSumPDF(self,dfProduct):
         df1 = dfProduct
+        
         today = date.today()
         doc = SimpleDocTemplate("Packing_Summary_"+str(today.strftime("%Y%m%d"))+".pdf",pagesize=A4,
                                 rightMargin=100,leftMargin=100,
-                                topMargin=20,bottomMargin=20)
+                                topMargin=20,bottomMargin=30)
         pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+
+        styles = getSampleStyleSheet()
+        styles.add(ParagraphStyle(name='Normal_LEFT',
+                                parent=styles['Normal'],
+                                fontName='THSarabunNew',
+                                alignment=TA_LEFT,
+                                fontSize=20,
+                                leading=13,
+                                textColor=colors.black,
+                                borderPadding=0,
+                                leftIndent=0,
+                                rightIndent=0,
+                                spaceAfter=0,
+                                spaceBefore=0,
+                                splitLongWords=True,
+                                spaceShrinkage=0.05,
+                                ))
+        # footer_content = Paragraph("This is a footer. It goes on every page.  ", styles['Normal_LEFT'])
+        # frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='normal')
+        # template = PageTemplate(id='test', frames=frame, onPage=partial(self.header_and_footer, footer_content=footer_content))
+        # doc.addPageTemplates([template])
 
         Story=[]
         logo = "src\logo-web.png"
@@ -753,8 +788,9 @@ class dm():
 
         Story.append(t)
         Story.append(Spacer(1, 12))
-
+        # print(df1)
         dataDict = self.btn_PackingSummary(df1)
+        # print(dataDict)
         key_list = list(dataDict.keys())
         tableData = [['No','Code','Product Name','Quantity','Unit','N.W. (kg)']]
         td = Table(tableData,style = [  ('BACKGROUND', (0, 0), (-1,-1), '#D2D2D2'),
