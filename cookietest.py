@@ -3,13 +3,15 @@ import time
 import pandas as pd
 from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.pagesizes import letter,A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageTemplate
+from reportlab.platypus.frames import Frame
+from functools import partial
+
 from reportlab.platypus import Image as ims
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-
 from datetime import date
-
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -18,11 +20,43 @@ from reportlab.lib import colors
 
 import DataManager
 
+def footer(canvas, doc, content):
+    canvas.saveState()
+    w, h = content.wrap(doc.width, doc.bottomMargin)
+    # print(doc.bottomMargin)
+    # print(type(doc.bottomMargin))
+    
+    content.drawOn(canvas, doc.leftMargin, h+20)
+    canvas.restoreState()
+
+def header_and_footer(canvas, doc, footer_content):
+    footer(canvas, doc, footer_content)
+    
 today = date.today()
-doc = SimpleDocTemplate("Invoic.pdf",pagesize=A4,
+doc = SimpleDocTemplate("CookieTest.pdf",pagesize=A4,
                         rightMargin=100,leftMargin=100,
-                        topMargin=20,bottomMargin=20)
+                        topMargin=20,bottomMargin=50)
 pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+
+styles = getSampleStyleSheet()
+styles.add(ParagraphStyle(name='Normal_LEFT',
+                          parent=styles['Normal'],
+                          fontName='THSarabunNew',
+                          alignment=TA_LEFT,
+                          fontSize=20,
+                          leading=13,
+                          textColor=colors.black,
+                          borderPadding=0,
+                          leftIndent=0,
+                          rightIndent=0,
+                          spaceAfter=0,
+                          spaceBefore=0,
+                          splitLongWords=True,
+                          spaceShrinkage=0.05,
+                          ))
+footer_content = Paragraph("This is a footer. It goes on every page.  ", styles['Normal_LEFT'])
+frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id='normal')
+template = PageTemplate(id='test', frames=frame, onPage=partial(header_and_footer, footer_content=footer_content))
 
 Story=[]
 logo = "Phase1\src\logo-web.png"
@@ -131,9 +165,9 @@ for i in key_list:
     Story.append(td)
 # Story.append(td)
 Story.append(Spacer(1, 12))
-
+doc.addPageTemplates([template])
 doc.build(Story)
-# print('CP')
+print('CP')
 ##########################################################
 # from reportlab.lib import colors
 # from reportlab.lib.pagesizes import LETTER, inch, portrait
