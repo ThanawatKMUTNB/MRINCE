@@ -436,11 +436,10 @@ class dm():
         width = 5*90
         height = 5*60
         image_list = []
-        no_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=80)
-        name_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=20)
-        address_fonts = ImageFont.truetype("../src/Kanit-Medium.ttf", size=10)
-        logo = Image.open("../src/LogoBW.png")
-        customer_df = pd.read_csv("../../orders-2022-06-20-00-16-07.csv")
+        no_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=80)
+        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=20)
+        address_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=10)
+        logo = Image.open(os.path.join("src","LogoBW.png"))
         #Max = int(input("Enter max number: "))
         order_id = {}
         for index, row in customer_df.iterrows():
