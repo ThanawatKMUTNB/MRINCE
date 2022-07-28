@@ -437,8 +437,8 @@ class dm():
         height = 5*60
         image_list = []
         no_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=80)
-        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=20)
-        address_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=10)
+        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=40)
+        #address_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=10)
         logo = Image.open(os.path.join("src","LogoBW.png"))
         #Max = int(input("Enter max number: "))
         order_id = {}
@@ -448,15 +448,15 @@ class dm():
         for no in order_id:
             customer_name = order_id[no]
             text_color = (0,0,0)
-            barcode = self.createbarcode(str(no)).resize((int(width/2),int(height/6)))
+            barcode = self.createbarcode(str(no)).resize((int(width/2),int(height/3)))
             img = Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
             self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(1.2/10))
             self.draw_multiple_line_text(img, customer_name, name_fonts, text_color, height*(4.5/10))
-            self.draw_multiple_line_text2(img, "Exporter : Ince TH Trade Co.,Ltd 37/346 M.7 Klong2 KlongLoung Pathum Thani 12120", address_fonts, text_color, height*(6/10),width/8)
-            self.draw_multiple_line_text2(img, "Importer : Ince UK limited 7 Blackstock Road London N4 2JF", address_fonts, text_color, height*(6/10),width/1.8)
+            # self.draw_multiple_line_text2(img, "Exporter : Ince TH Trade Co.,Ltd 37/346 M.7 Klong2 KlongLoung Pathum Thani 12120", address_fonts, text_color, height*(6/10),width/8)
+            # self.draw_multiple_line_text2(img, "Importer : Ince UK limited 7 Blackstock Road London N4 2JF", address_fonts, text_color, height*(6/10),width/1.8)
             img.paste(logo,(int(width/2.7),7))
-            img.paste(barcode,(int(width/4),int(height/1.3)))    
+            img.paste(barcode,(int(width/4),int(height/1.5)))    
             for copy in range(3): image_list.append(img.convert('RGB'))
         image_list[0].save('OrderLabel_pages.pdf', save_all=True, append_images=image_list[1:])
         print("OrderLabel Complete")
