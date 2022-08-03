@@ -138,7 +138,7 @@ class dm():
         height = 300
         fonts = ImageFont.truetype(self.font, size=20)
         fonts_weight = ImageFont.truetype(self.font, size=15)
-        fonts_sku = ImageFont.truetype(self.font, size=20)
+        #fonts_sku = ImageFont.truetype(self.font, size=20)
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -156,7 +156,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
@@ -209,7 +209,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
