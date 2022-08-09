@@ -17,12 +17,16 @@ class Ui_MainWindow(object):
         self.MainWindow = MainWindow
         self.MainWindow.setObjectName("MainWindow")
         self.MainWindow.resize(944, 572)
+
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout_2.setObjectName("gridLayout_2")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_2.setObjectName("gridLayout_2")
         self.select_file_button = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -31,11 +35,10 @@ class Ui_MainWindow(object):
         self.select_file_button.setSizePolicy(sizePolicy)
         self.select_file_button.setMinimumSize(QtCore.QSize(150, 0))
         self.select_file_button.setMaximumSize(QtCore.QSize(150, 30))
-        font = QtGui.QFont()
-        font.setPointSize(14)
         self.select_file_button.setFont(font)
         self.select_file_button.setObjectName("select_file_button")
         self.gridLayout.addWidget(self.select_file_button, 1, 0, 1, 1)
+
         self.customer_name = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -48,6 +51,7 @@ class Ui_MainWindow(object):
         self.customer_name.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
         self.customer_name.setObjectName("customer_name")
         self.gridLayout.addWidget(self.customer_name, 2, 1, 1, 1)
+
         self.add_btn = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -59,6 +63,7 @@ class Ui_MainWindow(object):
         self.add_btn.setAutoFillBackground(False)
         self.add_btn.setObjectName("add_btn")
         self.gridLayout.addWidget(self.add_btn, 4, 0, 1, 1)
+
         self.sub_btn = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -69,20 +74,23 @@ class Ui_MainWindow(object):
         self.sub_btn.setFont(font)
         self.sub_btn.setObjectName("sub_btn")
         self.gridLayout.addWidget(self.sub_btn, 4, 1, 1, 1)
+
         self.table = QtWidgets.QTableWidget(self.centralwidget)
         self.table.setFont(font)
         self.table.setObjectName("table")
-        self.table.setColumnCount(4)
+        self.table.setColumnCount(5)
         self.table.setRowCount(0)
-        self.table.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem())
-        self.table.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem())
-        self.table.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem())
-        self.table.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem())
+        self.table.setHorizontalHeaderItem(0, QtWidgets.QTableWidgetItem('SKU'))
+        self.table.setHorizontalHeaderItem(1, QtWidgets.QTableWidgetItem('สินค้า'))
+        self.table.setHorizontalHeaderItem(2, QtWidgets.QTableWidgetItem('จำนวนที่สั่ง'))
+        self.table.setHorizontalHeaderItem(3, QtWidgets.QTableWidgetItem('จำนวนที่ได้'))
+        self.table.setHorizontalHeaderItem(4, QtWidgets.QTableWidgetItem('กล่องที่'))
         self.table.horizontalHeader().setVisible(True)
         self.table.horizontalHeader().setCascadingSectionResizes(False)
         self.table.horizontalHeader().setSortIndicatorShown(False)
         self.table.verticalHeader().setVisible(False)
         self.gridLayout.addWidget(self.table, 6, 0, 1, 3)
+
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setMinimumSize(QtCore.QSize(150, 0))
         self.label.setMaximumSize(QtCore.QSize(150, 30))
@@ -90,6 +98,7 @@ class Ui_MainWindow(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 3, 0, 1, 1)
+
         self.clearBtn = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -101,12 +110,14 @@ class Ui_MainWindow(object):
         self.clearBtn.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.clearBtn.setObjectName("clearBtn")
         self.gridLayout.addWidget(self.clearBtn, 4, 2, 1, 1)
+        
         self.item_ID = QtWidgets.QLineEdit(self.centralwidget)
         self.item_ID.setMinimumSize(QtCore.QSize(0, 30))
         self.item_ID.setMaximumSize(QtCore.QSize(16777215, 30))
         self.item_ID.setFont(font)
         self.item_ID.setObjectName("item_ID")
         self.gridLayout.addWidget(self.item_ID, 3, 1, 1, 2)
+
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -119,10 +130,12 @@ class Ui_MainWindow(object):
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
+
         self.employee_name = QtWidgets.QLineEdit(self.centralwidget)
         self.employee_name.setFont(font)
         self.employee_name.setObjectName("employee_name")
         self.gridLayout.addWidget(self.employee_name, 2, 2, 1, 1)
+
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.status = QtWidgets.QLabel(self.centralwidget)
@@ -137,6 +150,7 @@ class Ui_MainWindow(object):
         self.status.setAlignment(QtCore.Qt.AlignCenter)
         self.status.setObjectName("status")
         self.horizontalLayout_2.addWidget(self.status)
+
         self.file_name_label = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -148,6 +162,7 @@ class Ui_MainWindow(object):
         self.file_name_label.setText("")
         self.file_name_label.setObjectName("file_name_label")
         self.horizontalLayout_2.addWidget(self.file_name_label)
+
         self.end_button = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -160,22 +175,30 @@ class Ui_MainWindow(object):
         self.end_button.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.end_button.setObjectName("end_button")
         self.horizontalLayout_2.addWidget(self.end_button)
+
         self.gridLayout.addLayout(self.horizontalLayout_2, 0, 0, 1, 3)
         self.cus_ID = QtWidgets.QLineEdit(self.centralwidget)
         self.cus_ID.setMinimumSize(QtCore.QSize(0, 30))
         self.cus_ID.setMaximumSize(QtCore.QSize(16777215, 40))
         self.cus_ID.setFont(font)
         self.cus_ID.setObjectName("cus_ID")
-        self.gridLayout.addWidget(self.cus_ID, 1, 1, 1, 2)
+        self.gridLayout.addWidget(self.cus_ID, 1, 1, 1, 1)
+
+        self.box_no = QtWidgets.QLineEdit(self.centralwidget)
+        self.box_no.setFont(font)
+        self.box_no.setObjectName("box_no")
+        self.gridLayout.addWidget(self.box_no, 1, 2, 1, 1)
+
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
+
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 894, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.MainWindow.setStatusBar(self.statusbar)
 
         # button
@@ -194,17 +217,17 @@ class Ui_MainWindow(object):
 
         # table
         header = self.table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        for i in [0, 2, 3, 4]:
+            header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
-        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         # sub window
         self.report_window = QtWidgets.QMainWindow()
         self.report_ui = Ui_ReportWindow()
         self.report_ui.setupUi(self.report_window)
 
-        self.report_ui.pushButton.clicked.connect(self.PDF_report)
+        self.report_ui.pushButton.clicked.connect(lambda: self.PDF_report(False))
+        self.report_ui.pushButton_2.clicked.connect(lambda: self.PDF_report(True))
 
         # set up variable
         self.changeMode(True)
@@ -227,16 +250,9 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "รหัสสินค้า : "))
         self.add_btn.setText(_translate("MainWindow", "เพิ่ม"))
         self.sub_btn.setText(_translate("MainWindow", "ลด"))
-        item = self.table.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "SKU"))
-        item = self.table.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "สินค้า"))
-        item = self.table.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "จำนวนที่สั่ง"))
-        item = self.table.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "จำนวนที่ได้"))
         self.clearBtn.setText(_translate("MainWindow", "Clear"))
         self.employee_name.setPlaceholderText(_translate("MainWindow", "ใส่ชื่อพนักงาน"))
+        self.box_no.setPlaceholderText(_translate("MainWindow", "กล่องที่"))
 
     def load_file(self) -> None:
         options = QFileDialog.Options()
@@ -275,6 +291,7 @@ class Ui_MainWindow(object):
     def get_customer_item_list(self) -> None: 
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
+        self.order_list = self.order_list.assign(BoxNo="")
 
     def show_item_list(self) -> None:
         self.table.setRowCount(0)
@@ -284,17 +301,27 @@ class Ui_MainWindow(object):
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
+            self.table.setItem(index, 4 ,QtWidgets.QTableWidgetItem(str(row['BoxNo'])))
 
-    def get_order_list(self) -> list:
+    def get_order_list(self, cartons=False) -> list:
         LIST = []
-        LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้'])
-        for index, row in self.order_list.iterrows():
-            ROW = []
-            ROW.append(str(row['Item Code']))
-            ROW.append(str(row['Item Name']))
-            ROW.append(str(row['Item Qty']))
-            ROW.append(str(row['ItemGet']))
-            LIST.append(ROW)
+        if cartons:
+            LIST.append(['SKU', 'สินค้า', 'กล่องที่'])
+            for index, row in self.order_list.iterrows():
+                ROW = []
+                ROW.append(str(row['Item Code']))
+                ROW.append(str(row['Item Name']))
+                ROW.append(str(row['BoxNo']))
+                LIST.append(ROW)
+        else:
+            LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้'])
+            for index, row in self.order_list.iterrows():
+                ROW = []
+                ROW.append(str(row['Item Code']))
+                ROW.append(str(row['Item Name']))
+                ROW.append(str(row['Item Qty']))
+                ROW.append(str(row['ItemGet']))
+                LIST.append(ROW)
         return LIST
 
     def clear_data(self) -> None:
@@ -316,28 +343,24 @@ class Ui_MainWindow(object):
             self.sub_btn.setStyleSheet("background-color : Red")
 
     def add_item(self) -> None:
-        print('start add item funcion')
         item_ID = self.item_ID.text()
-        print(f'read bar code as : {item_ID}')
         self.item_ID.clear()
         if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())):
             return
         SKU = self.readbarcode(item_ID)
-        print(f'SKU : {SKU}')
         found = False
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
-                print('SKU found in order list')
                 if self.add_mode:
-                    print('add item')
                     self.order_list.loc[index,'ItemGet'] += 1
+                    self.order_list.loc[index,'BoxNo'] = self.box_no.text()
                 elif self.order_list.loc[index,'ItemGet'] >0:
-                    print('sub item')
                     self.order_list.loc[index,'ItemGet'] -= 1
+                    if self.order_list.loc[index,'ItemGet'] == 0:
+                        self.order_list.loc[index,'BoxNo'] = ""
                 found = True
                 break
         if not found:
-            print('no SKU fount in order list -> Add new order')
             item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
             row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1}
             self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
@@ -400,7 +423,7 @@ class Ui_MainWindow(object):
 
         self.report_window.show()
         
-    def PDF_report(self):
+    def PDF_report(self, cartons=False):
         employee_name = self.employee_name.text()
         if employee_name == "":
             # show pop up
@@ -410,7 +433,7 @@ class Ui_MainWindow(object):
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             x = msg.exec_()
 
-        ListOfList = self.get_order_list()
+        ListOfList = self.get_order_list(cartons)
         if  len(ListOfList) == 1: return # No item found
         
         custumerName = self.customer_name.text()
@@ -439,15 +462,26 @@ class Ui_MainWindow(object):
         Story.append(Paragraph(custumerName, styles["Normals"]))
         Story.append(Spacer(1, 12))
         Story.append(Spacer(1, 12))
-        td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
-                                        ('FONT', (0,0), (-1,-1),('THSarabunNew')),
-                                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                                        ('FONTSIZE', (0,0), (-1,-1),15),
-                                        ("ALIGN", (0, 0), (0, 0), "CENTER"),
-                                        ],colWidths=[1*inch,4*inch,1*inch,1*inch],
-                                            rowHeights=0.4*inch)
+        if cartons:
+            td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
+                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                            ('FONTSIZE', (0,0), (-1,-1),15),
+                                            ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                            ],colWidths=[1*inch,5*inch,1*inch],
+                                                rowHeights=0.4*inch)
+        else:
+            td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
+                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                            ('FONTSIZE', (0,0), (-1,-1),15),
+                                            ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                            ],colWidths=[1*inch,4*inch,1*inch,1*inch],
+                                                rowHeights=0.4*inch)
         Story.append(td)
         Story.append(Spacer(1, 12))
         Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))

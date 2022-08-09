@@ -78,7 +78,7 @@ class dm():
                     line, font=font, fill=text_color)
             y_text += line_height
     
-    def draw_multiple_line_text2(image, text, font, text_color, text_start_height,start_width):
+    def draw_multiple_line_text2(self,image, text, font, text_color, text_start_height,start_width):
         draw = ImageDraw.Draw(image)
         image_width, image_height = image.size
         y_text = text_start_height
@@ -139,7 +139,7 @@ class dm():
         height = 300
         fonts = ImageFont.truetype(self.font, size=20)
         fonts_weight = ImageFont.truetype(self.font, size=15)
-        fonts_sku = ImageFont.truetype(self.font, size=20)
+        #fonts_sku = ImageFont.truetype(self.font, size=20)
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -157,7 +157,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
@@ -210,7 +210,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
@@ -438,8 +438,8 @@ class dm():
         height = 5*60
         image_list = []
         no_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=80)
-        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=20)
-        address_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=10)
+        name_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=40)
+        #address_fonts = ImageFont.truetype(os.path.join("src","Kanit-Medium.ttf"), size=10)
         logo = Image.open(os.path.join("src","LogoBW.png"))
         #Max = int(input("Enter max number: "))
         order_id = {}
@@ -449,15 +449,15 @@ class dm():
         for no in order_id:
             customer_name = order_id[no]
             text_color = (0,0,0)
-            barcode = self.createbarcode(str(no)).resize((int(width/2),int(height/6)))
+            barcode = self.createbarcode(str(no)).resize((int(width/2),int(height/4)))
             img = Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)
-            self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(1.2/10))
+            self.draw_multiple_line_text(img, str(no), no_fonts, text_color, height*(1.1/10))
             self.draw_multiple_line_text(img, customer_name, name_fonts, text_color, height*(4.5/10))
-            self.draw_multiple_line_text2(img, "Exporter : Ince TH Trade Co.,Ltd 37/346 M.7 Klong2 KlongLoung Pathum Thani 12120", address_fonts, text_color, height*(6/10),width/8)
-            self.draw_multiple_line_text2(img, "Importer : Ince UK limited 7 Blackstock Road London N4 2JF", address_fonts, text_color, height*(6/10),width/1.8)
-            img.paste(logo,(int(width/2.7),7))
-            img.paste(barcode,(int(width/4),int(height/1.3)))    
+            # self.draw_multiple_line_text2(img, "Exporter : Ince TH Trade Co.,Ltd 37/346 M.7 Klong2 KlongLoung Pathum Thani 12120", address_fonts, text_color, height*(6/10),width/8)
+            # self.draw_multiple_line_text2(img, "Importer : Ince UK limited 7 Blackstock Road London N4 2JF", address_fonts, text_color, height*(6/10),width/1.8)
+            #img.paste(logo,(int(width/2.7),7))
+            img.paste(barcode,(int(width/4),int(height/1.5)))    
             for copy in range(3): image_list.append(img.convert('RGB'))
         image_list[0].save('OrderLabel_pages.pdf', save_all=True, append_images=image_list[1:])
         print("OrderLabel Complete")
@@ -530,11 +530,11 @@ class dm():
                 #net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
                 net_weight = format(float(net_weight),'.2f')
             price = product_price[row['Product SKU']] 
-            product_name = row['Product Name'].split('(')
-            if len(product_name) > 2:
-                product_name.pop()
-                product_name = "".join(product_name)[:-2]
-            else: product_name = product_name[0][:-1]
+            product_name = row['Product Name']#.split('(')
+            # if len(product_name) > 2:
+            #     product_name.pop()
+            #     product_name = "".join(product_name)[:-2]
+            # else: product_name = product_name[0][:-1]
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             use_df.loc[index,'N.W. (kg)'] = float(net_weight)
@@ -933,11 +933,11 @@ class dm():
             if len(net_weight.split('.')[-1]) >1:
                 #net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
                 net_weight = format(float(net_weight),'.2f')
-            product_name = row['Product Name'].split('(')
-            if len(product_name) > 2:
-                product_name.pop()
-                product_name = "".join(product_name)[:-2]
-            else: product_name = product_name[0][:-1]
+            product_name = row['Product Name']#.split('(')
+            # if len(product_name) > 2:
+            #     product_name.pop()
+            #     product_name = "".join(product_name)[:-2]
+            # else: product_name = product_name[0][:-1]
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             if row['Product SKU'] in product_unit:
