@@ -195,7 +195,8 @@ class Ui(QtWidgets.QMainWindow):
         if self.ExportByCustomerPath != "" and self.ExportByProductPath != "":
             self.label_12.setText("Waiting...")
             self.label_12.setStyleSheet("color : red;")
-            sdm.invoicePDF(self.ExportByProductTable,self.ExportByCustomerTable)
+            # sdm.invoicePDF(self.ExportByProductTable,self.ExportByCustomerTable)
+            sdm.CIFinvoiceExel(self.ExportByProductTable,self.ExportByCustomerTable)
             self.label_12.setText("Compleate")
             self.label_12.setStyleSheet("color : green;")
     

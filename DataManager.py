@@ -1,4 +1,5 @@
 from datetime import date
+from ntpath import join
 import os
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
@@ -23,7 +24,7 @@ from reportlab.platypus.frames import Frame
 from reportlab.platypus import Image as ims
 from functools import partial
 from reportlab.platypus import Spacer
-
+import xlsxwriter
 class dm():
     def __init__(self):
         self.font = "src/Kanit-Light.ttf"
@@ -537,8 +538,9 @@ class dm():
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             use_df.loc[index,'N.W. (kg)'] = float(net_weight)
-            use_df.loc[index,'Unit Price (USD)'] = price
-            use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
+            use_df.loc[index,'Unit Price (USD)'] = round(price - 0.3 * price, 2)
+            # use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
+            use_df.loc[index,'Total (USD)'] = format(float(net_weight)*(price-(0.3*price)),'.2f')
 
         categories = list(set(use_df['Product Categories'].values.tolist()))
         df_dict = {}
@@ -550,6 +552,76 @@ class dm():
             new_df.insert(0,'No',numlist)
             df_dict[product] = new_df.values.tolist()
         return df_dict
+    
+    def CIFinvoiceExel(self,dfProduct,dfCustumer):
+        today = date.today()
+        workbook = xlsxwriter.Workbook('CIF_Invoice_'+str(today.strftime("%Y%m%d"))+'.xlsx')
+ 
+        # The workbook object is then used to add new
+        # worksheet via the add_worksheet() method.
+        worksheet = workbook.add_worksheet()
+        noByDate = 'No '+str(today.strftime("%Y%m%d"))
+        DateToday = 'Date '+str(today.strftime("%d %B %Y"))
+        textExpH = 'Exporter'
+        textImpH = 'Importer'
+        textExp = ['Ince TH Trade Co.,Ltd.',
+                   '37/346 M.7 Klong2 KlongLoung',
+                   'Pathum Thani 12120',
+                   'Thailand',
+                   'Tel. +66874940303',
+                   'Email. Lyn@mrince.com',
+                   'Tax Id. 013556214814']
+        textImp = ['Ince UK limited',
+                   '7 Blackstock Road London N4 2JF',
+                   'United Kingdom',
+                   'Tel. +447427267206',
+                   'Email. Kemal@mrince.com',
+                   'Tax Id. 08760604','']
+        # s = "-"
+        # s = s.join(list1)
+        worksheet.write('D1', 'Invoice')
+        worksheet.write('F2', noByDate)
+        worksheet.write('F3', DateToday)
+        worksheet.write('A4', DateToday)
+        worksheet.write('A5', textExpH)
+        worksheet.write('F5', textImpH)
+        worksheet.write('A6', "\n".join(textExp))
+        worksheet.write('F6', "\n".join(textImp))
+        # tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+        # worksheet.add_table('A7:F8', {'data': tableData,'header_row': False})
+        # worksheet.merge_range('A8:F8', 'Merged Range')
+        dataDict = self.btn_Invoice(self,dfProduct,dfCustumer)
+        TableLine = 1 + len(dataDict)
+        key_list = list(dataDict.keys())
+        print(sorted(key_list))
+        Lstart = 7
+        tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+        worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
+              
+        for i in sorted(key_list):
+            # tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+            # worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData,'header_row': False})
+            worksheet.merge_range('A'+str(Lstart+1)+':F'+str(Lstart+1), str(i))
+            worksheet.add_table('A'+str(Lstart+2)+':F'+str(Lstart+2+len(dataDict[i])), {'data': dataDict[i], 'style': None,'header_row': False})
+            worksheet.merge_range('A'+str(Lstart+2+len(dataDict[i]))+':C'+str(Lstart+2+len(dataDict[i])), str(i)+" Total")
+            nwSum = 0
+            unSum = 0
+            ttunSum = 0
+            ttnwSum = 0
+            for j in dataDict[i]:
+                nwSum += float(j[-3])
+                unSum += float(j[-1])
+                ttnwSum += round(nwSum, 2)
+                ttunSum += round(unSum, 2)
+            worksheet.write('D'+str(Lstart+2+len(dataDict[i])), str(round(nwSum, 2)))
+            worksheet.write('F'+str(Lstart+2+len(dataDict[i])), str(round(unSum, 2)))
+            Lstart += len(dataDict[i])+2
+            # print(dataDict[i])
+            print(len(dataDict[i]))
+        worksheet.merge_range('A'+str(Lstart+1)+':C'+str(Lstart+1), "Grand Total")
+        worksheet.write('D'+str(Lstart+1), str(round(ttnwSum, 2)))
+        worksheet.write('F'+str(Lstart+1), str(round(ttunSum, 2)))
+        workbook.close()
     
     def invoicePDF(self,dfProduct,dfCustumer):
         df1 = dfProduct

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>815</width>
+    <width>837</width>
     <height>603</height>
    </rect>
   </property>
@@ -212,7 +212,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Invoice</string>
+       <string>CIF Invoice</string>
       </property>
      </widget>
     </item>
@@ -347,7 +347,7 @@
        </font>
       </property>
       <property name="text">
-       <string/>
+       <string>Need Export by Product</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -933,7 +933,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>815</width>
+     <width>837</width>
      <height>21</height>
     </rect>
    </property>
