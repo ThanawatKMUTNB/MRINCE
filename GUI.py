@@ -205,7 +205,8 @@ class Ui(QtWidgets.QMainWindow):
         if self.ExportByProductPath != "":
             self.label_14.setText("Waiting...")
             self.label_14.setStyleSheet("color : red;")
-            sdm.packingSumPDF(self.ExportByProductTable)
+            sdm.packingSumExcel(self.ExportByProductTable)
+            # sdm.packingSumPDF(self.ExportByProductTable)
             self.label_14.setText("Compleate")
             self.label_14.setStyleSheet("color : green;")
             

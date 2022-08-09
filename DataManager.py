@@ -582,47 +582,33 @@ class dm():
         worksheet.write('D1', 'Invoice')
         worksheet.write('F2', noByDate)
         worksheet.write('F3', DateToday)
-        worksheet.write('A4', DateToday)
-        worksheet.write('A5', textExpH)
-        worksheet.write('F5', textImpH)
-        worksheet.write('A6', "\n".join(textExp))
-        worksheet.write('F6', "\n".join(textImp))
-        # tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
-        # worksheet.add_table('A7:F8', {'data': tableData,'header_row': False})
-        # worksheet.merge_range('A8:F8', 'Merged Range')
-        dataDict = self.btn_Invoice(self,dfProduct,dfCustumer)
+        worksheet.write('A4', textExpH)
+        worksheet.write('F4', textImpH)
+        worksheet.write('A5', "\n".join(textExp))
+        worksheet.write('F5', "\n".join(textImp))
+        dataDict = self.btn_Invoice(dfProduct,dfCustumer)
         key_list = list(dataDict.keys())
         # print(sorted(key_list))
         Lstart = 7
         tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
         worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
         Lstart += 1
+        ttunSum = 0
+        ttnwSum = 0
         for i in sorted(key_list):
             worksheet.merge_range('A'+str(Lstart)+':F'+str(Lstart), str(i))
-            # worksheet.add_table('A'+str(Lstart+2)+':F'+str(Lstart+2+len(dataDict[i])), {'data': dataDict[i], 'style': None,'header_row': False})
-            # for data in dataDict[i]:
-            #     worksheet.write_row(Lstart, 0, data) 
-            #     Lstart += 1      
-            # Lstart += 1
-            # worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart), str(i)+" Total")
-            # Lstart += 1
             nwSum = 0
             unSum = 0
-            ttunSum = 0
-            ttnwSum = 0
             for j in dataDict[i]:
                 nwSum += float(j[-3])
                 unSum += float(j[-1])
-                ttnwSum += round(nwSum, 2)
-                ttunSum += round(unSum, 2)
+            ttnwSum += round(nwSum, 2)
+            ttunSum += round(unSum, 2)
             dataWithSum = dataDict[i] + [[str(i)+" Total","","",str(round(nwSum, 2)),"",str(round(unSum, 2))]]
             for data in dataWithSum:
                 worksheet.write_row(Lstart, 0, data) 
                 Lstart += 1   
             worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart),str(i))
-            # worksheet.write_row(Lstart, 0, [str(i)+" Total","","",str(round(nwSum, 2)),"",str(round(unSum, 2))]) 
-            # worksheet.write('D'+str(Lstart), str(round(nwSum, 2)))
-            # worksheet.write('F'+str(Lstart), str(round(unSum, 2)))
             Lstart += 1
         worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart), "Grand Total")
         worksheet.write('D'+str(Lstart), str(round(ttnwSum, 2)))
@@ -765,7 +751,57 @@ class dm():
 
     def header_and_footer(self,canvas, doc, footer_content):
         self.footer(canvas, doc, footer_content)
+    
+    def  packingSumExcel(self,dfProduct):
+        today = date.today()
+        workbook = xlsxwriter.Workbook("Packing_Summary_"+str(today.strftime("%Y%m%d"))+'.xlsx')
+        worksheet = workbook.add_worksheet()
+        noByDate = 'Ref No : '+str(today.strftime("%Y%m%d"))
+        textExpH = 'Exporter'
+        textImpH = 'Importer'
+        textExp = ['Ince TH Trade Co.,Ltd.',
+                   '37/346 M.7 Klong2 KlongLoung',
+                   'Pathum Thani 12120',
+                   'Thailand',
+                   'Tel. +66874940303',
+                   'Email. Lyn@mrince.com',
+                   'Tax Id. 013556214814']
+        textImp = ['Ince UK limited',
+                   '7 Blackstock Road London N4 2JF',
+                   'United Kingdom',
+                   'Tel. +447427267206',
+                   'Email. Kemal@mrince.com',
+                   'Tax Id. 08760604','']
+        worksheet.write('D1', 'Packing Summary')
+        worksheet.write('F2', noByDate)
+        worksheet.write('A3', textExpH)
+        worksheet.write('F3', textImpH)
+        worksheet.write('A4', "\n".join(textExp))
+        worksheet.write('F4', "\n".join(textImp))
         
+        Lstart = 6
+        tableData = [['No','Code','Product Name','Quantity','Unit','N.W. (kg)']]
+        worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
+        Lstart += 1
+        dataDict = self.btn_PackingSummary(dfProduct)
+        key_list = list(dataDict.keys())
+        ttnwSum = 0
+        for i in sorted(key_list):
+            worksheet.merge_range('A'+str(Lstart)+':F'+str(Lstart), str(i))
+            nwSum = 0
+            for j in dataDict[i]:
+                nwSum += float(j[-1])
+            dataWithSum = dataDict[i] + [[str(i)+" Weigh","","","","",str(round(nwSum, 2))]]
+            for data in dataWithSum:
+                worksheet.write_row(Lstart, 0, data) 
+                Lstart += 1
+            ttnwSum += round(nwSum, 2)
+            worksheet.merge_range('A'+str(Lstart)+':E'+str(Lstart),str(i))
+            Lstart += 1
+        worksheet.merge_range('A'+str(Lstart)+':E'+str(Lstart), "Grand Weigh")
+        worksheet.write('F'+str(Lstart), str(round(ttnwSum, 2)))
+        workbook.close()
+    
     def  packingSumPDF(self,dfProduct):
         df1 = dfProduct
         
@@ -798,7 +834,7 @@ class dm():
 
         Story=[]
         logo = "src\logo-web.png"
-        paperHead = '<b>Invoic</b>'
+        paperHead = '<b>Packing Summary</b>'
         noByDate = 'Ref No : '+str(today.strftime("%Y%m%d"))
         textExpH = 'Exporter'
         textImpH = 'Importer'
