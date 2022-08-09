@@ -591,19 +591,21 @@ class dm():
         # worksheet.add_table('A7:F8', {'data': tableData,'header_row': False})
         # worksheet.merge_range('A8:F8', 'Merged Range')
         dataDict = self.btn_Invoice(self,dfProduct,dfCustumer)
-        TableLine = 1 + len(dataDict)
         key_list = list(dataDict.keys())
-        print(sorted(key_list))
+        # print(sorted(key_list))
         Lstart = 7
         tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
         worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
-              
+        Lstart += 1
         for i in sorted(key_list):
-            # tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
-            # worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData,'header_row': False})
-            worksheet.merge_range('A'+str(Lstart+1)+':F'+str(Lstart+1), str(i))
-            worksheet.add_table('A'+str(Lstart+2)+':F'+str(Lstart+2+len(dataDict[i])), {'data': dataDict[i], 'style': None,'header_row': False})
-            worksheet.merge_range('A'+str(Lstart+2+len(dataDict[i]))+':C'+str(Lstart+2+len(dataDict[i])), str(i)+" Total")
+            worksheet.merge_range('A'+str(Lstart)+':F'+str(Lstart), str(i))
+            # worksheet.add_table('A'+str(Lstart+2)+':F'+str(Lstart+2+len(dataDict[i])), {'data': dataDict[i], 'style': None,'header_row': False})
+            # for data in dataDict[i]:
+            #     worksheet.write_row(Lstart, 0, data) 
+            #     Lstart += 1      
+            # Lstart += 1
+            # worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart), str(i)+" Total")
+            # Lstart += 1
             nwSum = 0
             unSum = 0
             ttunSum = 0
@@ -613,14 +615,18 @@ class dm():
                 unSum += float(j[-1])
                 ttnwSum += round(nwSum, 2)
                 ttunSum += round(unSum, 2)
-            worksheet.write('D'+str(Lstart+2+len(dataDict[i])), str(round(nwSum, 2)))
-            worksheet.write('F'+str(Lstart+2+len(dataDict[i])), str(round(unSum, 2)))
-            Lstart += len(dataDict[i])+2
-            # print(dataDict[i])
-            print(len(dataDict[i]))
-        worksheet.merge_range('A'+str(Lstart+1)+':C'+str(Lstart+1), "Grand Total")
-        worksheet.write('D'+str(Lstart+1), str(round(ttnwSum, 2)))
-        worksheet.write('F'+str(Lstart+1), str(round(ttunSum, 2)))
+            dataWithSum = dataDict[i] + [[str(i)+" Total","","",str(round(nwSum, 2)),"",str(round(unSum, 2))]]
+            for data in dataWithSum:
+                worksheet.write_row(Lstart, 0, data) 
+                Lstart += 1   
+            worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart),str(i))
+            # worksheet.write_row(Lstart, 0, [str(i)+" Total","","",str(round(nwSum, 2)),"",str(round(unSum, 2))]) 
+            # worksheet.write('D'+str(Lstart), str(round(nwSum, 2)))
+            # worksheet.write('F'+str(Lstart), str(round(unSum, 2)))
+            Lstart += 1
+        worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart), "Grand Total")
+        worksheet.write('D'+str(Lstart), str(round(ttnwSum, 2)))
+        worksheet.write('F'+str(Lstart), str(round(ttunSum, 2)))
         workbook.close()
     
     def invoicePDF(self,dfProduct,dfCustumer):
