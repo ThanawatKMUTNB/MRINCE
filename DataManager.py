@@ -477,7 +477,7 @@ class dm():
                     topMargin=18,bottomMargin=18)
                 # styleSheet = getSampleStyleSheet()
                 data = ListOfList
-                pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+                pdfmetrics.registerFont(TTFont('THSarabunNew', os.path.join('src','THSarabunNew.ttf')))
                 t=Table(data,style = [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
                                     ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                                     ('FONT', (0,0), (-1,-1),('THSarabunNew')),
