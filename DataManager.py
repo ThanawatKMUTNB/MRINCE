@@ -553,6 +553,101 @@ class dm():
             df_dict[product] = new_df.values.tolist()
         return df_dict
     
+    def btn_fob_Invoice(self,product_df,customer_df):      #total USD
+        use_df = product_df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
+        # product_price = self.unitPrice(customer_df)
+        product_price = {}
+        for index,row in customer_df[['Item Code','Item Price']].drop_duplicates(keep='first').iterrows(): 
+            product_price[row['Item Code']] = row['Item Price']
+            
+        for index, row in use_df.iterrows():    #calculate weight
+            net_weight = str((int(re.findall('[0-9]+',row['Product Name'])[0])/1000)*int(row['Line Item Quantity']))  #Kg
+            if len(net_weight.split('.')[-1]) >1:
+                #net_weight = "".join(net_weight.split('.')[0]+'.'+net_weight.split('.')[-1][0])
+                net_weight = format(float(net_weight),'.2f')
+            price = product_price[row['Product SKU']] 
+            product_name = row['Product Name']#.split('(')
+            # if len(product_name) > 2:
+            #     product_name.pop()
+            #     product_name = "".join(product_name)[:-2]
+            # else: product_name = product_name[0][:-1]
+            use_df.loc[index,'Product Name'] = str(product_name)
+            #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
+            use_df.loc[index,'N.W. (kg)'] = float(net_weight)
+            use_df.loc[index,'Unit Price (USD)'] = round(price - 0.3 * price, 2)
+            # use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
+            use_df.loc[index,'Total (USD)'] = format(float(net_weight)*(price),'.2f')
+
+        categories = list(set(use_df['Product Categories'].values.tolist()))
+        df_dict = {}
+        for product in categories:
+            new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']].sort_values('Product SKU')
+            new_df.rename(columns={'Product SKU':'Code'},inplace=True)
+            numlist = []
+            for n in range(len(new_df.index)): numlist.append(n+1)
+            new_df.insert(0,'No',numlist)
+            df_dict[product] = new_df.values.tolist()
+        return df_dict
+    
+    def FOBinvoiceExel(self,dfProduct,dfCustumer):
+        today = date.today()
+        workbook = xlsxwriter.Workbook('FOB_Invoice_'+str(today.strftime("%Y%m%d"))+'.xlsx')
+        worksheet = workbook.add_worksheet()
+        noByDate = 'No '+str(today.strftime("%Y%m%d"))
+        DateToday = 'Date '+str(today.strftime("%d %B %Y"))
+        textExpH = 'Exporter'
+        textImpH = 'Importer'
+        textExp = ['Ince TH Trade Co.,Ltd.',
+                   '37/346 M.7 Klong2 KlongLoung',
+                   'Pathum Thani 12120',
+                   'Thailand',
+                   'Tel. +66874940303',
+                   'Email. Lyn@mrince.com',
+                   'Tax Id. 013556214814']
+        textImp = ['Ince UK limited',
+                   '7 Blackstock Road London N4 2JF',
+                   'United Kingdom',
+                   'Tel. +447427267206',
+                   'Email. Kemal@mrince.com',
+                   'Tax Id. 08760604','']
+        # s = "-"
+        # s = s.join(list1)
+        worksheet.write('D1', 'Invoice')
+        worksheet.write('F2', noByDate)
+        worksheet.write('F3', DateToday)
+        worksheet.write('A4', textExpH)
+        worksheet.write('F4', textImpH)
+        worksheet.write('A5', "\n".join(textExp))
+        worksheet.write('F5', "\n".join(textImp))
+        dataDict = self.btn_fob_Invoice(dfProduct,dfCustumer)
+        key_list = list(dataDict.keys())
+        # print(sorted(key_list))
+        Lstart = 7
+        tableData = [['No','Code','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']]
+        worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
+        Lstart += 1
+        ttunSum = 0
+        ttnwSum = 0
+        for i in sorted(key_list):
+            worksheet.merge_range('A'+str(Lstart)+':F'+str(Lstart), str(i))
+            nwSum = 0
+            unSum = 0
+            for j in dataDict[i]:
+                nwSum += float(j[-3])
+                unSum += float(j[-1])
+            ttnwSum += round(nwSum, 2)
+            ttunSum += round(unSum, 2)
+            dataWithSum = dataDict[i] + [[str(i)+" Total","","",str(round(nwSum, 2)),"",str(round(unSum, 2))]]
+            for data in dataWithSum:
+                worksheet.write_row(Lstart, 0, data) 
+                Lstart += 1   
+            worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart),str(i))
+            Lstart += 1
+        worksheet.merge_range('A'+str(Lstart)+':C'+str(Lstart), "Grand Total")
+        worksheet.write('D'+str(Lstart), str(round(ttnwSum, 2)))
+        worksheet.write('F'+str(Lstart), str(round(ttunSum, 2)))
+        workbook.close()
+        
     def CIFinvoiceExel(self,dfProduct,dfCustumer):
         today = date.today()
         workbook = xlsxwriter.Workbook('CIF_Invoice_'+str(today.strftime("%Y%m%d"))+'.xlsx')
@@ -783,7 +878,7 @@ class dm():
         tableData = [['No','Code','Product Name','Quantity','Unit','N.W. (kg)']]
         worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
         Lstart += 1
-        dataDict = self.btn_PackingSummary(self,dfProduct)
+        dataDict = self.btn_PackingSummary(dfProduct)
         key_list = list(dataDict.keys())
         ttnwSum = 0
         for i in sorted(key_list):

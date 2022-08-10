@@ -51,7 +51,7 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_9.clicked.connect(self.ExportDupCSV) #6
         self.pushButton_9.setStyleSheet("background-color : #00A5E3 ;color : white")
         
-        self.pushButton_8.clicked.connect(self.CustomerProduct) #7
+        self.pushButton_8.clicked.connect(self.FOBInvoice) #7
         self.pushButton_8.setStyleSheet("background-color : #4DD091 ;color : white")
         
         self.pushButton_14.setStyleSheet("background-color : #8AAB93 ;color : white") #8
@@ -68,7 +68,7 @@ class Ui(QtWidgets.QMainWindow):
         
         # font-size: 24px;
         # self.CustomerProductBT = self.findChild(QtWidgets.QPushButton, 'pushButton_8') #7
-        # self.CustomerProductBT.clicked.connect(self.CustomerProduct)
+        # self.CustomerProductBT.clicked.connect(self.FOBInvoice)
         # self.showFullScreen()
         self.showMaximized()
         #setFixedSize
@@ -181,12 +181,13 @@ class Ui(QtWidgets.QMainWindow):
         except :
             pass
         
-    def CustomerProduct(self):#7
+    def FOBInvoice(self):#7
         sdm = DataManager.dm()
         if self.ExportByCustomerPath != "":
             self.label_6.setText("Waiting...")
             self.label_6.setStyleSheet("color : red;")
-            sdm.Customer_product(self.ExportByCustomerTable)
+            # sdm.Customer_product(self.ExportByCustomerTable)
+            sdm.FOBinvoiceExel(self.ExportByProductTable,self.ExportByCustomerTable)
             self.label_6.setText("Compleate")
             self.label_6.setStyleSheet("color : green;")
     
