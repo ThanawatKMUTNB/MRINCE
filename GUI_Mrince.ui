@@ -411,7 +411,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Customer Barcode</string>
+       <string>Fob Invoice</string>
       </property>
      </widget>
     </item>

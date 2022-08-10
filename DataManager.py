@@ -783,7 +783,7 @@ class dm():
         tableData = [['No','Code','Product Name','Quantity','Unit','N.W. (kg)']]
         worksheet.add_table('A'+str(Lstart)+':F'+str(Lstart), {'data': tableData, 'style': None,'header_row': False})
         Lstart += 1
-        dataDict = self.btn_PackingSummary(dfProduct)
+        dataDict = self.btn_PackingSummary(self,dfProduct)
         key_list = list(dataDict.keys())
         ttnwSum = 0
         for i in sorted(key_list):
@@ -798,8 +798,17 @@ class dm():
             ttnwSum += round(nwSum, 2)
             worksheet.merge_range('A'+str(Lstart)+':E'+str(Lstart),str(i))
             Lstart += 1
-        worksheet.merge_range('A'+str(Lstart)+':E'+str(Lstart), "Grand Weigh")
+        # worksheet.merge_range('A'+str(Lstart)+':E'+str(Lstart), "Grand Weigh")
+        worksheet.write('E'+str(Lstart), "Product Weight (Kg)")
         worksheet.write('F'+str(Lstart), str(round(ttnwSum, 2)))
+        worksheet.write('E'+str(Lstart+1), "Carton Weight (Kg)")
+        worksheet.write('E'+str(Lstart+2), "Total Weight (Kg)")
+        worksheet.write('E'+str(Lstart+3), "Vegetable")
+        worksheet.write('E'+str(Lstart+4), "Fruit")
+        worksheet.write('E'+str(Lstart+5), "Seasoning")
+        worksheet.write('E'+str(Lstart+6), "Flower")
+        worksheet.write('E'+str(Lstart+7), "Dried Food")
+        worksheet.write('E'+str(Lstart+8), "Dessert")
         workbook.close()
     
     def  packingSumPDF(self,dfProduct):
