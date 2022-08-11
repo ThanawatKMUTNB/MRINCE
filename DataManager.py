@@ -303,7 +303,7 @@ class dm():
             # s = getSampleStyleSheet()
             # s = s["BodyText"]
             # s.wordWrap = 'CJK'
-            pdfmetrics.registerFont(TTFont('THSarabunNew', 'THSarabunNew.ttf'))
+            pdfmetrics.registerFont(TTFont('THSarabunNew', os.path.join('src','THSarabunNew.ttf')))
             style = ParagraphStyle(
                                     name='Normal_CENTER',
                                     fontName='THSarabunNew',
