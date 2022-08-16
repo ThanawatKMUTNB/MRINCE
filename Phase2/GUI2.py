@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFileDialog, QHeaderView
 import pandas as pd
 import textwrap
 from report import Ui_ReportWindow
-from reportlab.platypus import SimpleDocTemplate,Paragraph, Spacer, Table
+from reportlab.platypus import SimpleDocTemplate,Paragraph, Spacer, Table, PageBreak
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -12,6 +12,7 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 import sys
+import os
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.MainWindow = MainWindow
@@ -240,6 +241,18 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        if not os.path.exists('./file'):
+            os.mkdir('./file')
+
+        self.cartons_table_style = [('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
+                                    ('FONT', (0,0), (-1,-1),('THSarabunNew')),
+                                    ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                                    ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                                    ('FONTSIZE', (0,0), (-1,-1),15),
+                                    ("ALIGN", (0, 0), (0, 0), "CENTER"),
+                                    ]
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -362,7 +375,7 @@ class Ui_MainWindow(object):
                 break
         if not found:
             item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
-            row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1}
+            row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1, 'BoxNo': ''}
             self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
         self.show_item_list()
 
@@ -432,12 +445,17 @@ class Ui_MainWindow(object):
             msg.setText("กรุณาใส่ชื่อพนักงาน")
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             x = msg.exec_()
+            return
 
         ListOfList = self.get_order_list(cartons)
         if  len(ListOfList) == 1: return # No item found
         
         custumerName = self.customer_name.text()
-        doc = SimpleDocTemplate(str(custumerName)+".pdf",pagesize=A4,
+        if cartons:
+            file_name = f"./file/{custumerName}_cartons.pdf"
+        else:
+            file_name = f"./file/{custumerName}.pdf"
+        doc = SimpleDocTemplate(file_name,pagesize=A4,
                                 rightMargin=100,leftMargin=100,
                                 topMargin=20,bottomMargin=20)
         pdfmetrics.registerFont(TTFont('THSarabunNew', './src/THSarabunNew.ttf'))
@@ -448,7 +466,7 @@ class Ui_MainWindow(object):
                                 parent=styles['Normal'],
                                 fontName='THSarabunNew',
                                 alignment=TA_LEFT,
-                                fontSize=16,
+                                fontSize=20,
                                 leading=0,
                                 textColor=colors.black,
                                 borderPadding=0,
@@ -459,33 +477,58 @@ class Ui_MainWindow(object):
                                 splitLongWords=True,
                                 spaceShrinkage=0.05,
                                 ))
-        Story.append(Paragraph(custumerName, styles["Normals"]))
+        Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
         Story.append(Spacer(1, 12))
         Story.append(Spacer(1, 12))
         if cartons:
-            td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
-                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
-                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                                            ('FONTSIZE', (0,0), (-1,-1),15),
-                                            ("ALIGN", (0, 0), (0, 0), "CENTER"),
-                                            ],colWidths=[1*inch,5*inch,1*inch],
-                                                rowHeights=0.4*inch)
+            td = Table(ListOfList,style = self.cartons_table_style
+                                            ,colWidths=[1*inch,5*inch,1*inch],
+                                            rowHeights=0.4*inch)
         else:
-            td = Table(ListOfList,style = [  ('BACKGROUND', (0, 0), (-1,0), '#D2D2D2'),
-                                            ('FONT', (0,0), (-1,-1),('THSarabunNew')),
-                                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                                            ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                                            ('FONTSIZE', (0,0), (-1,-1),15),
-                                            ("ALIGN", (0, 0), (0, 0), "CENTER"),
-                                            ],colWidths=[1*inch,4*inch,1*inch,1*inch],
-                                                rowHeights=0.4*inch)
+            td = Table(ListOfList,style = self.cartons_table_style,
+                                            colWidths=[1*inch,4*inch,1*inch,1*inch],
+                                            rowHeights=0.4*inch)
         Story.append(td)
         Story.append(Spacer(1, 12))
         Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))
-        doc.build(Story)
+        if cartons:
+            Story.append(PageBreak())
+            GROUP = self.order_list.groupby('BoxNo')
+            N = len(GROUP)
+            i = 1
+            hasNan = False
+            for scala, group in GROUP:
+                ListOfList = []
+                ListOfList.append(['SKU', 'สินค้า', 'กล่องที่'])
+                for index, row in group.iterrows():
+                    if scala == '':
+                        ListOfList.append([row['Item Code'], row['Item Name'], 'nan'])
+                    else:
+                        ListOfList.append([row['Item Code'], row['Item Name'], row['BoxNo']])
+                if scala == '':
+                    hasNan = True
+                    Nan = ListOfList.copy()
+                    continue
+                td = Table(ListOfList,style = self.cartons_table_style,
+                                                colWidths=[1*inch,5*inch,1*inch],
+                                                rowHeights=0.4*inch)
+                Story.append(td)
+                if i < N:
+                    Story.append(PageBreak())
+                    i += 1
+            if hasNan:
+                td = Table(Nan,style = self.cartons_table_style,
+                                        colWidths=[1*inch,5*inch,1*inch],
+                                        rowHeights=0.4*inch)
+                Story.append(td)
+        try:
+            doc.build(Story)
+        except PermissionError:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("คำเตือน")
+            msg.setText("กรุณาปิดไฟล์ PDF ก่อนทำการ save")
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            x = msg.exec_()
         
 if __name__ == '__main__':
     import sys
