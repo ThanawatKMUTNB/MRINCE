@@ -588,6 +588,9 @@ class dm():
             new_df.insert(0,'No',numlist)
             df_dict[product] = new_df.values.tolist()
         return df_dict
+        # print(len(use_df) , len(new_df))
+        # print(new_df)
+        # return use_df
     
     def FOBinvoiceExel(self,dfProduct,dfCustumer):
         today = date.today()
@@ -1045,6 +1048,7 @@ class dm():
         Story.append(Spacer(1, 12))
 
         doc.build(Story)
+    
     # def btn_PackingList(self,df):      #Packing
     #     use_df = df[['Product SKU','Product Name','Line Item Quantity','Product Categories']]
     #     for index, row in use_df.iterrows():    #calculate weight
@@ -1093,7 +1097,10 @@ class dm():
             else:
                 use_df.loc[index,'Unit'] = product_unit['Else']
             use_df.loc[index,'N.W. (kg)'] = float(net_weight)
-
+        
+        # print(len(use_df))
+        use_df = use_df.groupby(['Product SKU','Product Name',"Product Categories","Unit"]).sum().reset_index()
+        # print(use_df)
         categories = list(set(use_df['Product Categories'].values.tolist()))
         df_dict = {}
         for product in categories:
@@ -1103,5 +1110,10 @@ class dm():
             for n in range(len(new_df.index)): numlist.append(n+1)
             new_df.insert(0,'No',numlist)
             df_dict[product] = new_df.values.tolist()
+        
+        # ddf = use_df[use_df.duplicated(["Product SKU","Product Name"])]
+        # # print(len(use_df))
+        # ddf = ddf.sort_values(by=['Product SKU'])
+        # print(ddf)
         return df_dict
     
