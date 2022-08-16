@@ -541,6 +541,9 @@ class dm():
             use_df.loc[index,'Unit Price (USD)'] = round(price - 0.3 * price, 2)
             # use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
             use_df.loc[index,'Total (USD)'] = format(float(net_weight)*(price-(0.3*price)),'.2f')
+        
+        use_df[['Total (USD)']] = use_df[['Total (USD)']].astype(float)
+        use_df = use_df.groupby(['Product SKU','Product Name','Product Categories',"Unit Price (USD)"]).sum().reset_index()
 
         categories = list(set(use_df['Product Categories'].values.tolist()))
         df_dict = {}
@@ -577,8 +580,19 @@ class dm():
             use_df.loc[index,'Unit Price (USD)'] = round(price - 0.3 * price, 2)
             # use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
             use_df.loc[index,'Total (USD)'] = format(float(net_weight)*(price),'.2f')
-
+        # print(use_df.sort_values(by=['Product SKU']))
+        # ddf = use_df[use_df.duplicated(["Product SKU","Product Name","Product Categories","Unit Price (USD)"])]
+        # print(ddf.sort_values(by=['Product SKU']))
+        # print(use_df)
+        # print(use_df.dtypes)
+        use_df[['Total (USD)']] = use_df[['Total (USD)']].astype(float)
+        # print(use_df.dtypes)
+        # use_df = use_df.groupby(['Product SKU','Product Name','Product Categories',"Unit Price (USD)"])["Line Item Quantity","N.W. (kg)",'Total (USD)'].transform('sum')
+        use_df = use_df.groupby(['Product SKU','Product Name','Product Categories',"Unit Price (USD)"]).sum().reset_index()
+        # print(use_df)
+        
         categories = list(set(use_df['Product Categories'].values.tolist()))
+        # print(use_df)
         df_dict = {}
         for product in categories:
             new_df = use_df.loc[use_df['Product Categories']==product][['Product SKU','Product Name','N.W. (kg)','Unit Price (USD)','Total (USD)']].sort_values('Product SKU')
