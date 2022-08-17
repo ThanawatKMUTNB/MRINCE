@@ -577,7 +577,7 @@ class dm():
             use_df.loc[index,'Product Name'] = str(product_name)
             #use_df.loc[index,'Product Name'] = str(row['Product Name'].split('(')[0])
             use_df.loc[index,'N.W. (kg)'] = float(net_weight)
-            use_df.loc[index,'Unit Price (USD)'] = round(price - 0.3 * price, 2)
+            use_df.loc[index,'Unit Price (USD)'] = round(price, 2)
             # use_df.loc[index,'Total (USD)'] = format(float(net_weight)*price,'.2f')
             use_df.loc[index,'Total (USD)'] = format(float(net_weight)*(price),'.2f')
         # print(use_df.sort_values(by=['Product SKU']))
