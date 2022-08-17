@@ -331,7 +331,7 @@ class Ui_MainWindow(object):
     def get_customer_item_list(self) -> None: 
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
-        self.order_list = self.order_list.assign(BoxNo="")
+        self.order_list['BoxNo'] = [set() for i in range(len(self.order_list))]
         self.order_list['Weight'] = [int(re.search('([0-9]+)', name).group()) for name in self.order_list['Item Name']]
 
     def show_item_list(self) -> None:
@@ -342,7 +342,8 @@ class Ui_MainWindow(object):
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
-            self.table.setItem(index, 4 ,QtWidgets.QTableWidgetItem(str(row['BoxNo'])))
+            BoxNo = f"{sorted(row['BoxNo'])}".replace("'","")[1:-1]
+            self.table.setItem(index, 4 ,QtWidgets.QTableWidgetItem(BoxNo))
 
     def get_order_list(self, cartons=False) -> list:
         LIST = []
@@ -352,7 +353,10 @@ class Ui_MainWindow(object):
                 ROW = []
                 ROW.append(str(row['Item Code']))
                 ROW.append(str(row['Item Name']))
-                ROW.append(str(row['BoxNo']))
+                if len(row['BoxNo']) == 0:
+                    ROW.append('')
+                else:
+                    ROW.append(f"{sorted(row['BoxNo'])}".replace("'","")[1:-1])
                 LIST.append(ROW)
         else:
             LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้'])
@@ -396,25 +400,28 @@ class Ui_MainWindow(object):
             if row['Item Code'] == SKU:
                 if self.add_mode:
                     self.order_list.loc[index,'ItemGet'] += 1
-                    self.order_list.loc[index,'BoxNo'] = carton_code
+                    self.order_list.loc[index,'BoxNo'].add(carton_code)
+                    if '' in self.order_list.loc[index,'BoxNo']:
+                        self.order_list.loc[index,'BoxNo'].remove('')
                     self.add_list_by_item(SKU, item_name, carton_code)
                 elif self.order_list.loc[index,'ItemGet'] > 0:
                     self.order_list.loc[index,'ItemGet'] -= 1
-                    self.sub_list_by_item(SKU, carton_code)
+                    self.sub_list_by_item(SKU)
                     if self.order_list.loc[index,'ItemGet'] == 0:
-                        self.order_list.loc[index,'BoxNo'] = ''
+                        self.order_list.loc[index,'BoxNo'] = set([''])
                 found = True
                 break
         if (not found) and self.add_mode:
             row = {
-                'Item Code':SKU, 
+                'Item Code':SKU,
                 'Item Name':item_name,
-                'Item Qty': 0, 
-                'ItemGet': 1, 
-                'BoxNo': carton_code, 
+                'Item Qty': 0,
+                'ItemGet': 1,
+                'BoxNo': set(carton_code),
                 'Weight': int(re.search('([0-9]+)', item_name).group())
             }
-            self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
+            if not self.order_list.empty:
+                self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
             self.add_list_by_item(SKU, item_name, carton_code)
         
         self.show_item_list()
@@ -424,26 +431,27 @@ class Ui_MainWindow(object):
             self.list_by_item[self.ID] = {}
             self.list_by_item[self.ID][SKU] = {
                 'Item' : item_name,
-                'carton code' : carton_code,
+                'carton code' : set(carton_code),
                 'Qty' : 1
             }
         else:
             if SKU not in self.list_by_item[self.ID].keys():
                  self.list_by_item[self.ID][SKU] = {
                 'Item' : item_name,
-                'carton code' : carton_code,
+                'carton code' : set(carton_code),
                 'Qty' : 1
             }
             else:
                 self.list_by_item[self.ID][SKU]['Qty'] += 1
-                self.list_by_item[self.ID][SKU]['carton code'] = carton_code
+                self.list_by_item[self.ID][SKU]['carton code'].add(carton_code)
     
-    def sub_list_by_item(self, SKU, carton_code):
+    def sub_list_by_item(self, SKU):
         if self.ID in self.list_by_item.keys():
             if SKU in self.list_by_item[self.ID].keys():
                 if self.list_by_item[self.ID][SKU]['Qty'] > 0:
-                    self.list_by_item[self.ID][SKU]['Qty'] -= 1 
-                    self.list_by_item[self.ID][SKU]['carton code'] = carton_code
+                    self.list_by_item[self.ID][SKU]['Qty'] -= 1
+                    if self.list_by_item[self.ID][SKU]['Qty'] == 0:
+                        self.list_by_item[self.ID][SKU]['carton code'] = set() 
 
     def end_of_program(self):
         df = pd.DataFrame(
@@ -454,11 +462,14 @@ class Ui_MainWindow(object):
                 item_name = self.list_by_item[cartons_number][SKU]['Item']
                 qty = self.list_by_item[cartons_number][SKU]['Qty']
                 unit = int(re.search('([0-9]+)', item_name).group())
+                if len(self.list_by_item[cartons_number][SKU]['carton code']) == 0:
+                    continue
+                carton_code = f"{sorted(list(self.list_by_item[cartons_number][SKU]['carton code']))}".replace("'","")[1:-1]
                 row = {
                     'SKU' : SKU,
                     'Item' : re.sub('\(.*\)', '', item_name),
                     'carton number' : cartons_number,
-                    'carton code' : self.list_by_item[cartons_number][SKU]['carton code'],
+                    'carton code' : carton_code,
                     'Qty (Pcs)' : qty,
                     'unit (g)' : unit,
                     'total (g)' : qty*unit
@@ -590,7 +601,8 @@ class Ui_MainWindow(object):
         Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))
         if cartons:
             Story.append(PageBreak())
-            GROUP = self.order_list.groupby('BoxNo')
+            self.order_list['CartonCode'] = self.get_str_carton(self.order_list['BoxNo'])
+            GROUP = self.order_list.groupby('CartonCode')
             N = len(GROUP)
             i = 1
             hasNan = False
@@ -641,6 +653,16 @@ class Ui_MainWindow(object):
             msg.setText("กรุณาปิดไฟล์ PDF ก่อนทำการ save")
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             x = msg.exec_()
+
+    def get_str_carton(self, series : pd.Series):
+        s = []
+        for carton in series:
+            if len(carton) == 0:
+                text = ''
+            else:
+                text = f"{[x for x in carton]}".replace("'","")[1:-1]
+            s.append(text)
+        return s
         
 if __name__ == '__main__':
     import sys
