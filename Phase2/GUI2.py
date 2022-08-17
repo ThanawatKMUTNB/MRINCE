@@ -448,7 +448,6 @@ class Ui_MainWindow(object):
                 self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
             self.add_list_by_item(SKU, item_name, carton_code)
         self.show_item_list()
-        print(self.carton_count)
 
     def add_list_by_item(self, SKU, item_name, carton_code):
         if self.ID not in self.list_by_item.keys():
@@ -652,12 +651,34 @@ class Ui_MainWindow(object):
                                                 rowHeights=0.4*inch)
                 Story.append(td)
                 Story.append(PageBreak())
+            # Add nan page
+            nan_list = self.order_list.loc[self.order_list['ItemGet'] == 0]
+            if len(nan_list) > 0:
+                Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
+                Story.append(Spacer(1, 24))
+                Story.append(Paragraph(f"Cartons Code : nan", styles["Normals"]))
+                Story.append(Spacer(1, 24))
+                ListOfList = []
+                ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
+                for index, row in self.order_list.loc[self.order_list['ItemGet'] == 0].iterrows():
+                    ListOfList.append([row['Item Name'], '0', row['Weight'], '0'])
+                ListOfList.append(['total', '0', '', '0'])
+                td = Table(ListOfList,style = self.cartons_table_style,
+                                                colWidths=[4*inch,1*inch,1*inch,1*inch],
+                                                rowHeights=0.4*inch)
+                Story.append(td)
         try:
             doc.build(Story)
         except PermissionError:
             msg = QtWidgets.QMessageBox()
             msg.setWindowTitle("คำเตือน")
             msg.setText("กรุณาปิดไฟล์ PDF ก่อนทำการ save")
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            x = msg.exec_()
+        except:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("คำเตือน")
+            msg.setText("ไม่สามารถทำการเขียนไฟล์ PDF ได้")
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             x = msg.exec_()
 
