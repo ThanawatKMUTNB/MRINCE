@@ -601,50 +601,34 @@ class Ui_MainWindow(object):
         Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))
         if cartons:
             Story.append(PageBreak())
-            self.order_list['CartonCode'] = self.get_str_carton(self.order_list['BoxNo'])
-            GROUP = self.order_list.groupby('CartonCode')
-            N = len(GROUP)
-            i = 1
-            hasNan = False
-            for scala, group in GROUP:
-                if scala != '':
-                    Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
-                    Story.append(Spacer(1, 12))
-                    Story.append(Spacer(1, 12))
-                    Story.append(Paragraph(f"Cartons Code : {scala}", styles["Normals"]))
-                    Story.append(Spacer(1, 12))
-                    Story.append(Spacer(1, 12))
+            carton_dict = {}
+            for index, row in self.order_list.iterrows():
+                carton = row['BoxNo']
+                for c in carton:
+                    if c not in carton_dict.keys():
+                        carton_dict[c] = set([row['Item Name']])
+                    else:
+                        carton_dict[c].add(row['Item Name'])
+            for c in carton_dict:
+                Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
+                Story.append(Spacer(2, 24))
+                Story.append(Paragraph(f"Cartons Code : {c}", styles["Normals"]))
+                Story.append(Spacer(2, 24))
                 ListOfList = []
                 ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
                 Qty = total = 0
-                for index, row in group.iterrows():
-                    Qty += row['ItemGet']
-                    weight = row["ItemGet"]*row["Weight"]
+                for ItemName in carton_dict[c]:
+                    item = self.order_list.loc[self.order_list['Item Name'] == ItemName].iloc[0]
+                    Qty += item['ItemGet']
+                    weight = item["ItemGet"]*item["Weight"]
                     total += weight
-                    ListOfList.append([row['Item Name'], row['ItemGet'], row['Weight'], f'{weight}'])
+                    ListOfList.append([item['Item Name'], item['ItemGet'], item['Weight'], f'{weight}'])
                 ListOfList.append(['total', f'{Qty}', '', f'{total}'])
-                if scala == '':
-                    hasNan = True
-                    Nan = ListOfList.copy()
-                    continue
                 td = Table(ListOfList,style = self.cartons_table_style,
                                                 colWidths=[4*inch,1*inch,1*inch,1*inch],
                                                 rowHeights=0.4*inch)
                 Story.append(td)
-                if i < N:
-                    Story.append(PageBreak())
-                    i += 1
-            if hasNan:
-                Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
-                Story.append(Spacer(1, 12))
-                Story.append(Spacer(1, 12))
-                Story.append(Paragraph(f"Cartons Code : nan", styles["Normals"]))
-                Story.append(Spacer(1, 12))
-                Story.append(Spacer(1, 12))
-                td = Table(Nan,style = self.cartons_table_style,
-                                        colWidths=[4*inch,1*inch,1*inch,1*inch],
-                                        rowHeights=0.4*inch)
-                Story.append(td)
+                Story.append(PageBreak())
         try:
             doc.build(Story)
         except PermissionError:
