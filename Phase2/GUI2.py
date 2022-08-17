@@ -1,8 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QFileDialog, QHeaderView
-import pandas as pd
-import textwrap
-from report import Ui_ReportWindow
+
 from reportlab.platypus import SimpleDocTemplate,Paragraph, Spacer, Table, PageBreak
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
@@ -11,9 +9,13 @@ from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
+
 import sys
 import os
 import re
+import pandas as pd
+import textwrap
+from report import Ui_ReportWindow
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.MainWindow = MainWindow
@@ -220,6 +222,7 @@ class Ui_MainWindow(object):
         self.add_btn.clicked.connect(lambda : self.changeMode(True))
         self.sub_btn.clicked.connect(lambda : self.changeMode(False))
         self.clearBtn.clicked.connect(self.clear_data)
+        self.pushButton.clicked.connect(self.end_of_program)
 
         # Label
         self.status.setText('สถานะ : ไม่พร้อม')
@@ -249,6 +252,7 @@ class Ui_MainWindow(object):
         self.csv = pd.DataFrame()
         self.order_list = pd.DataFrame()
         self.all_order_list = pd.DataFrame()
+        self.list_by_item = {}
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -287,14 +291,24 @@ class Ui_MainWindow(object):
         if fileName:
             # load csv
             self.csv = pd.read_csv(fileName)
-            self.file_name_label.setText(fileName)
-            self.status.setText('สถานะ : พร้อม')
-            self.set_all_order_list()
+            self.set_all_order_list(fileName)
     
-    def set_all_order_list(self):
+    def set_all_order_list(self, fileName):
         if self.csv.empty:
             return
-        self.all_order_list = self.csv.drop_duplicates(subset=['Item Code']).reset_index(drop=True)[['Item Code', 'Item Name']].copy()
+        try:
+            self.all_order_list = self.csv.drop_duplicates(subset=['Item Code']).reset_index(drop=True)[['Item Code', 'Item Name']].copy()
+            self.status.setText('สถานะ : พร้อม')
+            self.file_name_label.setText(fileName)
+        except:
+            self.csv = pd.DataFrame()
+            # show pop up
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("คำเตือน")
+            msg.setText("กรุณาเลือกไฟล์ที่ถูกต้อง")
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            x = msg.exec_()
+            return
 
     def show_customer_info(self) -> None:
         if self.csv.empty:
@@ -375,30 +389,93 @@ class Ui_MainWindow(object):
         if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())):
             return
         SKU = self.readbarcode(item_ID)
+        item_name = str(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name'].reset_index(drop=True)[0])
         found = False
+        carton_code = self.box_no.text()
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
                 if self.add_mode:
                     self.order_list.loc[index,'ItemGet'] += 1
-                    self.order_list.loc[index,'BoxNo'] = self.box_no.text()
-                elif self.order_list.loc[index,'ItemGet'] >0:
+                    self.order_list.loc[index,'BoxNo'] = carton_code
+                    self.add_list_by_item(SKU, item_name, carton_code)
+                elif self.order_list.loc[index,'ItemGet'] > 0:
                     self.order_list.loc[index,'ItemGet'] -= 1
+                    self.sub_list_by_item(SKU, carton_code)
                     if self.order_list.loc[index,'ItemGet'] == 0:
-                        self.order_list.loc[index,'BoxNo'] = ""
+                        self.order_list.loc[index,'BoxNo'] = ''
                 found = True
                 break
-        if not found:
-            item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
+        if (not found) and self.add_mode:
             row = {
                 'Item Code':SKU, 
-                'Item Name':item_name, 
+                'Item Name':item_name,
                 'Item Qty': 0, 
                 'ItemGet': 1, 
-                'BoxNo': '', 
+                'BoxNo': carton_code, 
                 'Weight': int(re.search('([0-9]+)', item_name).group())
             }
             self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
+            self.add_list_by_item(SKU, item_name, carton_code)
+        
         self.show_item_list()
+
+    def add_list_by_item(self, SKU, item_name, carton_code):
+        if self.ID not in self.list_by_item.keys():
+            self.list_by_item[self.ID] = {}
+            self.list_by_item[self.ID][SKU] = {
+                'Item' : item_name,
+                'carton code' : carton_code,
+                'Qty' : 1
+            }
+        else:
+            if SKU not in self.list_by_item[self.ID].keys():
+                 self.list_by_item[self.ID][SKU] = {
+                'Item' : item_name,
+                'carton code' : carton_code,
+                'Qty' : 1
+            }
+            else:
+                self.list_by_item[self.ID][SKU]['Qty'] += 1
+                self.list_by_item[self.ID][SKU]['carton code'] = carton_code
+    
+    def sub_list_by_item(self, SKU, carton_code):
+        if self.ID in self.list_by_item.keys():
+            if SKU in self.list_by_item[self.ID].keys():
+                if self.list_by_item[self.ID][SKU]['Qty'] > 0:
+                    self.list_by_item[self.ID][SKU]['Qty'] -= 1 
+                    self.list_by_item[self.ID][SKU]['carton code'] = carton_code
+
+    def end_of_program(self):
+        df = pd.DataFrame(
+            columns=['SKU', 'Item', 'carton number', 'carton code', 'Qty (Pcs)', 'unit (g)', 'total (g)'],
+        )
+        for cartons_number in self.list_by_item:
+            for SKU in self.list_by_item[cartons_number]:
+                item_name = self.list_by_item[cartons_number][SKU]['Item']
+                qty = self.list_by_item[cartons_number][SKU]['Qty']
+                unit = int(re.search('([0-9]+)', item_name).group())
+                row = {
+                    'SKU' : SKU,
+                    'Item' : re.sub('\(.*\)', '', item_name),
+                    'carton number' : cartons_number,
+                    'carton code' : self.list_by_item[cartons_number][SKU]['carton code'],
+                    'Qty (Pcs)' : qty,
+                    'unit (g)' : unit,
+                    'total (g)' : qty*unit
+                }
+                df = pd.concat([df, pd.DataFrame(row, index=[0])], ignore_index=True)
+        df = df.sort_values(by=['carton code'])
+        row = {
+            'SKU' : 'Total',
+            'Item' : '',
+            'carton number' : '',
+            'carton code' : len(df.groupby('carton code').count()),
+            'Qty (Pcs)' : df['Qty (Pcs)'].sum(),
+            'unit (g)' : df['unit (g)'].sum(),
+            'total (g)' : df['total (g)'].sum(),
+        }
+        df = pd.concat([df, pd.DataFrame(row, index=[0])], ignore_index=True)
+        df.to_excel('./file/Packing list by item.xlsx', engine='openpyxl', index=False)
 
     def readbarcode(self, num : str) -> str:
         if num == "6979700123456":return "EOF"  #End of file
