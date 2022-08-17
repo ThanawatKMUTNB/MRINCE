@@ -13,6 +13,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 import sys
 import os
+import re
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.MainWindow = MainWindow
@@ -190,6 +191,17 @@ class Ui_MainWindow(object):
         self.box_no.setObjectName("box_no")
         self.gridLayout.addWidget(self.box_no, 1, 2, 1, 1)
 
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+        self.pushButton.setSizePolicy(sizePolicy)
+        self.pushButton.setFont(font)
+        self.pushButton.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.pushButton.setObjectName("pushButton")
+        self.gridLayout.addWidget(self.pushButton, 8, 2, 1, 1)
+
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -266,6 +278,7 @@ class Ui_MainWindow(object):
         self.clearBtn.setText(_translate("MainWindow", "Clear"))
         self.employee_name.setPlaceholderText(_translate("MainWindow", "ใส่ชื่อพนักงาน"))
         self.box_no.setPlaceholderText(_translate("MainWindow", "กล่องที่"))
+        self.pushButton.setText(_translate("MainWindow", "End of Program"))
 
     def load_file(self) -> None:
         options = QFileDialog.Options()
@@ -305,6 +318,7 @@ class Ui_MainWindow(object):
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
         self.order_list = self.order_list.assign(BoxNo="")
+        self.order_list['Weight'] = [int(re.search('([0-9]+)', name).group()) for name in self.order_list['Item Name']]
 
     def show_item_list(self) -> None:
         self.table.setRowCount(0)
@@ -375,7 +389,14 @@ class Ui_MainWindow(object):
                 break
         if not found:
             item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name']
-            row = {'Item Code':SKU, 'Item Name':item_name, 'Item Qty': 0, 'ItemGet': 1, 'BoxNo': ''}
+            row = {
+                'Item Code':SKU, 
+                'Item Name':item_name, 
+                'Item Qty': 0, 
+                'ItemGet': 1, 
+                'BoxNo': '', 
+                'Weight': int(re.search('([0-9]+)', item_name).group())
+            }
             self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
         self.show_item_list()
 
@@ -452,7 +473,7 @@ class Ui_MainWindow(object):
         
         custumerName = self.customer_name.text()
         if cartons:
-            file_name = f"./file/{custumerName}_cartons.pdf"
+            file_name = f"./file/{custumerName} cartons.pdf"
         else:
             file_name = f"./file/{custumerName}.pdf"
         doc = SimpleDocTemplate(file_name,pagesize=A4,
@@ -461,7 +482,6 @@ class Ui_MainWindow(object):
         pdfmetrics.registerFont(TTFont('THSarabunNew', './src/THSarabunNew.ttf'))
         Story=[]
         styles=getSampleStyleSheet()
-        # styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
         styles.add(ParagraphStyle(name='Normals',
                                 parent=styles['Normal'],
                                 fontName='THSarabunNew',
@@ -498,27 +518,42 @@ class Ui_MainWindow(object):
             i = 1
             hasNan = False
             for scala, group in GROUP:
+                if scala != '':
+                    Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
+                    Story.append(Spacer(1, 12))
+                    Story.append(Spacer(1, 12))
+                    Story.append(Paragraph(f"Cartons Code : {scala}", styles["Normals"]))
+                    Story.append(Spacer(1, 12))
+                    Story.append(Spacer(1, 12))
                 ListOfList = []
-                ListOfList.append(['SKU', 'สินค้า', 'กล่องที่'])
+                ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
+                Qty = total = 0
                 for index, row in group.iterrows():
-                    if scala == '':
-                        ListOfList.append([row['Item Code'], row['Item Name'], 'nan'])
-                    else:
-                        ListOfList.append([row['Item Code'], row['Item Name'], row['BoxNo']])
+                    Qty += row['ItemGet']
+                    weight = row["ItemGet"]*row["Weight"]
+                    total += weight
+                    ListOfList.append([row['Item Name'], row['ItemGet'], row['Weight'], f'{weight}'])
+                ListOfList.append(['total', f'{Qty}', '', f'{total}'])
                 if scala == '':
                     hasNan = True
                     Nan = ListOfList.copy()
                     continue
                 td = Table(ListOfList,style = self.cartons_table_style,
-                                                colWidths=[1*inch,5*inch,1*inch],
+                                                colWidths=[4*inch,1*inch,1*inch,1*inch],
                                                 rowHeights=0.4*inch)
                 Story.append(td)
                 if i < N:
                     Story.append(PageBreak())
                     i += 1
             if hasNan:
+                Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
+                Story.append(Spacer(1, 12))
+                Story.append(Spacer(1, 12))
+                Story.append(Paragraph(f"Cartons Code : nan", styles["Normals"]))
+                Story.append(Spacer(1, 12))
+                Story.append(Spacer(1, 12))
                 td = Table(Nan,style = self.cartons_table_style,
-                                        colWidths=[1*inch,5*inch,1*inch],
+                                        colWidths=[4*inch,1*inch,1*inch,1*inch],
                                         rowHeights=0.4*inch)
                 Story.append(td)
         try:
