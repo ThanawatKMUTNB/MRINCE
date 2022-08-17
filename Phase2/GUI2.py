@@ -253,6 +253,7 @@ class Ui_MainWindow(object):
         self.order_list = pd.DataFrame()
         self.all_order_list = pd.DataFrame()
         self.list_by_item = {}
+        self.carton_count = {}
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -323,6 +324,9 @@ class Ui_MainWindow(object):
             info = self.csv.loc[self.csv['No.'] == self.ID].iloc[0]
             # clear old text
             self.customer_name.clear()
+            ID = self.cus_ID.text()
+            self.clear_data()
+            self.cus_ID.setText(ID)
             # set new text
             self.customer_name.setText(info['Customer Name'])
             self.get_customer_item_list()
@@ -375,6 +379,7 @@ class Ui_MainWindow(object):
         self.customer_name.clear()
         self.cus_ID.clear()
         self.employee_name.clear()
+        self.carton_count = {}
         self.order_list = pd.DataFrame()
 
     def changeMode(self, add):
@@ -396,19 +401,38 @@ class Ui_MainWindow(object):
         item_name = str(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name'].reset_index(drop=True)[0])
         found = False
         carton_code = self.box_no.text()
+        if carton_code == '' : return
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
                 if self.add_mode:
                     self.order_list.loc[index,'ItemGet'] += 1
                     self.order_list.loc[index,'BoxNo'].add(carton_code)
+
+                    # add Carton Count
+                    if item_name not in self.carton_count.keys():
+                        self.carton_count[item_name] = {
+                            carton_code : 1
+                        }
+                    else:
+
+                        if carton_code not in self.carton_count[item_name].keys():
+                            self.carton_count[item_name][carton_code] = 1
+                        else:
+                            self.carton_count[item_name][carton_code] += 1
+
                     if '' in self.order_list.loc[index,'BoxNo']:
                         self.order_list.loc[index,'BoxNo'].remove('')
                     self.add_list_by_item(SKU, item_name, carton_code)
                 elif self.order_list.loc[index,'ItemGet'] > 0:
-                    self.order_list.loc[index,'ItemGet'] -= 1
-                    self.sub_list_by_item(SKU)
+                    if item_name in self.carton_count.keys():
+                        if carton_code in self.carton_count[item_name].keys(): 
+                            self.carton_count[item_name][carton_code] -= 1
+                            self.order_list.loc[index,'ItemGet'] -= 1
+                            if self.carton_count[item_name][carton_code] == 0 : self.carton_count[item_name].pop(carton_code, None) # remove carton if = 0
+                        if len(self.carton_count[item_name].keys()) == 0 : self.carton_count.pop(item_name, None)
                     if self.order_list.loc[index,'ItemGet'] == 0:
                         self.order_list.loc[index,'BoxNo'] = set([''])
+                    self.sub_list_by_item(SKU)
                 found = True
                 break
         if (not found) and self.add_mode:
@@ -423,8 +447,8 @@ class Ui_MainWindow(object):
             if not self.order_list.empty:
                 self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
             self.add_list_by_item(SKU, item_name, carton_code)
-        
         self.show_item_list()
+        print(self.carton_count)
 
     def add_list_by_item(self, SKU, item_name, carton_code):
         if self.ID not in self.list_by_item.keys():
@@ -586,8 +610,7 @@ class Ui_MainWindow(object):
                                 spaceShrinkage=0.05,
                                 ))
         Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
-        Story.append(Spacer(1, 12))
-        Story.append(Spacer(1, 12))
+        Story.append(Spacer(1, 24))
         if cartons:
             td = Table(ListOfList,style = self.cartons_table_style
                                             ,colWidths=[1*inch,5*inch,1*inch],
@@ -597,7 +620,7 @@ class Ui_MainWindow(object):
                                             colWidths=[1*inch,4*inch,1*inch,1*inch],
                                             rowHeights=0.4*inch)
         Story.append(td)
-        Story.append(Spacer(1, 12))
+        Story.append(Spacer(1, 24))
         Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))
         if cartons:
             Story.append(PageBreak())
@@ -611,18 +634,18 @@ class Ui_MainWindow(object):
                         carton_dict[c].add(row['Item Name'])
             for c in carton_dict:
                 Story.append(Paragraph(f'{self.ID} : {custumerName}', styles["Normals"]))
-                Story.append(Spacer(2, 24))
+                Story.append(Spacer(1, 24))
                 Story.append(Paragraph(f"Cartons Code : {c}", styles["Normals"]))
-                Story.append(Spacer(2, 24))
+                Story.append(Spacer(1, 24))
                 ListOfList = []
                 ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
                 Qty = total = 0
                 for ItemName in carton_dict[c]:
                     item = self.order_list.loc[self.order_list['Item Name'] == ItemName].iloc[0]
-                    Qty += item['ItemGet']
-                    weight = item["ItemGet"]*item["Weight"]
+                    Qty += self.carton_count[ItemName][c]
+                    weight = self.carton_count[ItemName][c]*item["Weight"]
                     total += weight
-                    ListOfList.append([item['Item Name'], item['ItemGet'], item['Weight'], f'{weight}'])
+                    ListOfList.append([item['Item Name'], self.carton_count[ItemName][c], item['Weight'], f'{weight}'])
                 ListOfList.append(['total', f'{Qty}', '', f'{total}'])
                 td = Table(ListOfList,style = self.cartons_table_style,
                                                 colWidths=[4*inch,1*inch,1*inch,1*inch],
