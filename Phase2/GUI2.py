@@ -346,7 +346,7 @@ class Ui_MainWindow(object):
             self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
             self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
             self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
-            BoxNo = f"{sorted(row['BoxNo'])}".replace("'","")[1:-1]
+            BoxNo = f"{sorted(list(row['BoxNo']))}".replace("'","")[1:-1]
             self.table.setItem(index, 4 ,QtWidgets.QTableWidgetItem(BoxNo))
 
     def get_order_list(self, cartons=False) -> list:
@@ -395,10 +395,11 @@ class Ui_MainWindow(object):
     def add_item(self) -> None:
         item_ID = self.item_ID.text()
         self.item_ID.clear()
-        if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())):
+        if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())) or self.all_order_list.empty:
             return
         SKU = self.readbarcode(item_ID)
-        item_name = str(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU]['Item Name'].reset_index(drop=True)[0])
+        if len(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True)) == 0 : return
+        item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True).iloc[0]['Item Name']
         found = False
         carton_code = self.box_no.text()
         if carton_code == '' : return
@@ -441,11 +442,12 @@ class Ui_MainWindow(object):
                 'Item Name':item_name,
                 'Item Qty': 0,
                 'ItemGet': 1,
-                'BoxNo': set(carton_code),
                 'Weight': int(re.search('([0-9]+)', item_name).group())
             }
             if not self.order_list.empty:
-                self.order_list = pd.concat([self.order_list, pd.DataFrame(row)], ignore_index=True)
+                df = pd.DataFrame(row, index=[0])
+                df['BoxNo'] = [set([carton_code])]
+                self.order_list = pd.concat([self.order_list, df], ignore_index=True)
             self.add_list_by_item(SKU, item_name, carton_code)
         self.show_item_list()
 
