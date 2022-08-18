@@ -763,10 +763,10 @@ class Ui_MainWindow(object):
         
     def popup_error(self):
         error_dialog = QtWidgets.QErrorMessage()
-        error_dialog.setMinimumHeight(300)
-        error_dialog.setMinimumWidth(650)
-        error_dialog.showMessage(traceback.format_exc())
-        print(traceback.format_exc().split('\n'))
+        error_dialog.setMinimumHeight(350)
+        error_dialog.setMinimumWidth(700)
+        message = traceback.format_exc().replace('\n', '<br>')
+        error_dialog.showMessage(message)
         error_dialog.exec_()
 
 if __name__ == '__main__':
