@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate,Paragraph, Spacer, Table, PageB
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import  TA_LEFT
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -15,6 +15,7 @@ import os
 import re
 import pandas as pd
 import textwrap
+import traceback
 from report import Ui_ReportWindow
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -254,6 +255,7 @@ class Ui_MainWindow(object):
         self.all_order_list = pd.DataFrame()
         self.list_by_item = {}
         self.carton_count = {}
+        self.Item_set = set()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -295,9 +297,7 @@ class Ui_MainWindow(object):
                 self.csv = pd.read_csv(fileName)
                 self.set_all_order_list(fileName)
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
     
     def set_all_order_list(self, fileName):
         try:
@@ -317,9 +317,7 @@ class Ui_MainWindow(object):
                 x = msg.exec_()
                 return
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def show_customer_info(self) -> None:
         try:
@@ -343,20 +341,18 @@ class Ui_MainWindow(object):
                 self.get_customer_item_list()
                 self.show_item_list()
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+           self.popup_error()
             
     def get_customer_item_list(self) -> None: 
         try:
             self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
             self.order_list = self.order_list.assign(ItemGet=0)
             self.order_list['BoxNo'] = [set() for i in range(len(self.order_list))]
-            self.order_list['Weight'] = [int(re.search('([0-9]+)', name).group()) for name in self.order_list['Item Name']]
+            self.order_list['Weight'] = [int(re.search(r'\d+', x).group()) for x in [re.search(r"\((\d+).+\)", name).group()[1:-1]for name in self.order_list['Item Name']]]
+            for SKU in self.order_list['Item Name']:
+                self.Item_set.add(SKU)
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def show_item_list(self) -> None:
         try:
@@ -367,12 +363,11 @@ class Ui_MainWindow(object):
                 self.table.setItem(index, 1 ,QtWidgets.QTableWidgetItem(str(row['Item Name'])))
                 self.table.setItem(index, 2 ,QtWidgets.QTableWidgetItem(str(row['Item Qty'])))
                 self.table.setItem(index, 3 ,QtWidgets.QTableWidgetItem(str(row['ItemGet'])))
-                BoxNo = f"{sorted(list(row['BoxNo']))}".replace("'","")[1:-1]
-                self.table.setItem(index, 4 ,QtWidgets.QTableWidgetItem(BoxNo))
+                if row['Item Name'] in self.carton_count.keys():
+                    BoxNo = ', '.join(self.carton_count[row['Item Name']])
+                    self.table.setItem(index, 4, QtWidgets.QTableWidgetItem(BoxNo))
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def get_order_list(self, cartons=False) -> list:
         try:
@@ -399,9 +394,7 @@ class Ui_MainWindow(object):
                     LIST.append(ROW)
             return LIST
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def clear_data(self) -> None:
         try:
@@ -412,10 +405,9 @@ class Ui_MainWindow(object):
             self.employee_name.clear()
             self.carton_count = {}
             self.order_list = pd.DataFrame()
+            self.Item_set = set()
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def changeMode(self, add):
         if add:
@@ -465,12 +457,18 @@ class Ui_MainWindow(object):
                             if carton_code in self.carton_count[item_name].keys(): 
                                 self.carton_count[item_name][carton_code] -= 1
                                 self.order_list.loc[index,'ItemGet'] -= 1
-                                if self.carton_count[item_name][carton_code] == 0 : self.carton_count[item_name].pop(carton_code, None) # remove carton if = 0
+                                if self.carton_count[item_name][carton_code] == 0: 
+                                    self.carton_count[item_name].pop(carton_code, None) # remove carton if = 0
+                                    if (item_name not in self.Item_set) and (sum(self.carton_count[item_name].values()) == 0):  # item not in original order list
+                                        print("drop")
+                                        self.order_list.drop([index], axis=0, inplace=True)
                             if len(self.carton_count[item_name].keys()) == 0 : self.carton_count.pop(item_name, None)
-                        if self.order_list.loc[index,'ItemGet'] == 0:
-                            self.order_list.loc[index,'BoxNo'] = set([''])
+                        if item_name in self.Item_set:
+                            if self.order_list.loc[index,'ItemGet'] == 0:
+                                self.order_list.loc[index,'BoxNo'] = set([''])
                         self.sub_list_by_item(SKU)
                     found = True
+                    
                     break
             if (not found) and self.add_mode:
                 row = {
@@ -478,18 +476,23 @@ class Ui_MainWindow(object):
                     'Item Name':item_name,
                     'Item Qty': 0,
                     'ItemGet': 1,
-                    'Weight': int(re.search('([0-9]+)', item_name).group())
+                    'Weight': int(re.search(r'\d+',re.search(r"\((\d+).+\)", item_name).group()[1:-1]).group())
                 }
                 if not self.order_list.empty:
                     df = pd.DataFrame(row, index=[0])
                     df['BoxNo'] = [set([carton_code])]
                     self.order_list = pd.concat([self.order_list, df], ignore_index=True)
-                self.add_list_by_item(SKU, item_name, carton_code)
+                    if item_name not in self.carton_count.keys():
+                        self.carton_count[item_name] = {
+                            carton_code : 1
+                        }
+                    else:
+                        self.carton_count[item_name][carton_code] = 1
+                    self.add_list_by_item(SKU, item_name, carton_code)
             self.show_item_list()
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
+        print(self.carton_count)
 
     def add_list_by_item(self, SKU, item_name, carton_code):
         try:
@@ -511,9 +514,7 @@ class Ui_MainWindow(object):
                     self.list_by_item[self.ID][SKU]['Qty'] += 1
                     self.list_by_item[self.ID][SKU]['carton code'].add(carton_code)
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def sub_list_by_item(self, SKU):
         try:
@@ -524,9 +525,7 @@ class Ui_MainWindow(object):
                         if self.list_by_item[self.ID][SKU]['Qty'] == 0:
                             self.list_by_item[self.ID][SKU]['carton code'] = set() 
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def end_of_program(self):
         try:
@@ -537,7 +536,7 @@ class Ui_MainWindow(object):
                 for SKU in self.list_by_item[cartons_number]:
                     item_name = self.list_by_item[cartons_number][SKU]['Item']
                     qty = self.list_by_item[cartons_number][SKU]['Qty']
-                    unit = int(re.search('([0-9]+)', item_name).group())
+                    unit = int(re.search(r'\d+',re.search(r"\((\d+).+\)", item_name).group()[1:-1]).group())
                     if len(self.list_by_item[cartons_number][SKU]['carton code']) == 0:
                         continue
                     carton_code = f"{sorted(list(self.list_by_item[cartons_number][SKU]['carton code']))}".replace("'","")[1:-1]
@@ -564,9 +563,7 @@ class Ui_MainWindow(object):
             df = pd.concat([df, pd.DataFrame(row, index=[0])], ignore_index=True)
             df.to_excel('./file/Packing list by item.xlsx', engine='openpyxl', index=False)
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def readbarcode(self, num : str) -> str:
         try:
@@ -579,9 +576,7 @@ class Ui_MainWindow(object):
             for c in alpha: chr_list.append(str(chr(int(c))))   
             return str("".join(chr_list)+num[-4:])
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def get_report(self) -> pd.DataFrame:
         try:
@@ -609,9 +604,7 @@ class Ui_MainWindow(object):
                 data = pd.concat([data,df], ignore_index=True)
             return data
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def show_report_window(self):
         try:
@@ -636,9 +629,7 @@ class Ui_MainWindow(object):
 
             self.report_window.show()
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
         
     def PDF_report(self, cartons=False):
         try:
@@ -755,9 +746,7 @@ class Ui_MainWindow(object):
                 msg.setIcon(QtWidgets.QMessageBox.Critical)
                 x = msg.exec_()
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
 
     def get_str_carton(self, series : pd.Series):
         try:
@@ -770,10 +759,16 @@ class Ui_MainWindow(object):
                 s.append(text)
             return s
         except Exception as e:
-            error_dialog = QtWidgets.QErrorMessage()
-            error_dialog.showMessage(str(e))
-            error_dialog.exec_()
+            self.popup_error()
         
+    def popup_error(self):
+        error_dialog = QtWidgets.QErrorMessage()
+        error_dialog.setMinimumHeight(300)
+        error_dialog.setMinimumWidth(650)
+        error_dialog.showMessage(traceback.format_exc())
+        print(traceback.format_exc().split('\n'))
+        error_dialog.exec_()
+
 if __name__ == '__main__':
     import sys
 
