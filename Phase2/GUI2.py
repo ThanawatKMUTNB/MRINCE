@@ -168,6 +168,15 @@ class Ui_MainWindow(object):
         self.file_name_label.setObjectName("file_name_label")
         self.horizontalLayout_2.addWidget(self.file_name_label)
 
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+
+        self.id_add_label = QtWidgets.QLabel(self.centralwidget)
+        self.id_add_label.setFont(font)
+        self.id_add_label.setText("ID : ")
+        self.id_add_label.setObjectName("id_add_label")
+        self.horizontalLayout_3.addWidget(self.id_add_label)
+
         self.end_button = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -203,7 +212,8 @@ class Ui_MainWindow(object):
         self.pushButton.setFont(font)
         self.pushButton.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.pushButton.setObjectName("pushButton")
-        self.gridLayout.addWidget(self.pushButton, 8, 2, 1, 1)
+        self.horizontalLayout_3.addWidget(self.pushButton)
+        self.gridLayout.addLayout(self.horizontalLayout_3, 8, 2, 1, 1)
 
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -460,7 +470,6 @@ class Ui_MainWindow(object):
                                 if self.carton_count[item_name][carton_code] == 0: 
                                     self.carton_count[item_name].pop(carton_code, None) # remove carton if = 0
                                     if (item_name not in self.Item_set) and (sum(self.carton_count[item_name].values()) == 0):  # item not in original order list
-                                        print("drop")
                                         self.order_list.drop([index], axis=0, inplace=True)
                             if len(self.carton_count[item_name].keys()) == 0 : self.carton_count.pop(item_name, None)
                         if item_name in self.Item_set:
@@ -492,7 +501,6 @@ class Ui_MainWindow(object):
             self.show_item_list()
         except Exception as e:
             self.popup_error()
-        print(self.carton_count)
 
     def add_list_by_item(self, SKU, item_name, carton_code):
         try:
@@ -513,6 +521,8 @@ class Ui_MainWindow(object):
                 else:
                     self.list_by_item[self.ID][SKU]['Qty'] += 1
                     self.list_by_item[self.ID][SKU]['carton code'].add(carton_code)
+            print(self.list_by_item)
+            self.id_add_label.setText(f'ID : {self.ID} ถูกเพิ่ม')
         except Exception as e:
             self.popup_error()
 
@@ -523,7 +533,9 @@ class Ui_MainWindow(object):
                     if self.list_by_item[self.ID][SKU]['Qty'] > 0:
                         self.list_by_item[self.ID][SKU]['Qty'] -= 1
                         if self.list_by_item[self.ID][SKU]['Qty'] == 0:
-                            self.list_by_item[self.ID][SKU]['carton code'] = set() 
+                            self.list_by_item[self.ID][SKU]['carton code'] = set()
+                        self.id_add_label.setText(f'ID : {self.ID} ถูกลด')
+            print(self.list_by_item)
         except Exception as e:
             self.popup_error()
 
