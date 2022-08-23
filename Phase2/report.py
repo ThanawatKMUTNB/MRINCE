@@ -141,7 +141,7 @@ class Ui_ReportWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("subWindow", "subWindow"))
         self.label_1.setText(_translate("subWindow", "ขาด"))
-        self.pushButton.setText(_translate("MainWindow", "Export to Excel"))
+        self.pushButton.setText(_translate("MainWindow", "Export to CSV"))
         self.pushButton_2.setText(_translate("MainWindow", "Cartons"))
         item = self.tableWidget_1.horizontalHeaderItem(0)
         item.setText(_translate("subWindow", "รายการ"))

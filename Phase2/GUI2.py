@@ -666,7 +666,7 @@ class Ui_MainWindow(object):
             if len(ListOfList) == 1: return # No item found
             if not cartons:
                 df = pd.DataFrame(ListOfList[1:], columns = ['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้', 'ราคาต่อชิ้น', 'ราคารวม'])
-                df.to_excel(f'./file/{custumerName}.xlsx', engine='openpyxl', index=False)
+                df.to_csv(f'./file/{custumerName}.csv', encoding='utf-8', index=False)
                 return
             
             if cartons:
