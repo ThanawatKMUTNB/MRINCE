@@ -16,6 +16,8 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+# add directory src
+a.datas += Tree('./src', prefix='dir_to_include')
 # Avoid warning
 to_remove = ["_AES", "_ARC4", "_DES", "_DES3", "_SHA256", "_counter"]
 for b in a.binaries:

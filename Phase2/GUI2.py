@@ -355,7 +355,7 @@ class Ui_MainWindow(object):
             
     def get_customer_item_list(self) -> None: 
         try:
-            self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty']].reset_index(drop=True)
+            self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty', 'Item Price']].reset_index(drop=True)
             self.order_list = self.order_list.assign(ItemGet=0)
             self.order_list['BoxNo'] = [set() for i in range(len(self.order_list))]
             self.order_list['Weight'] = [int(re.search(r'\d+', x).group()) for x in [re.search(r"\((\d+).+\)", name).group()[1:-1]for name in self.order_list['Item Name']]]
@@ -394,14 +394,22 @@ class Ui_MainWindow(object):
                         ROW.append(f"{sorted(row['BoxNo'])}".replace("'","")[1:-1])
                     LIST.append(ROW)
             else:
-                LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้'])
+                count = get = total_price = 0
+                LIST.append(['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้', 'ราคาต่อชิ้น', 'ราคารวม'])
                 for index, row in self.order_list.iterrows():
+                    count += row['Item Qty']
+                    get += row['ItemGet']
+                    price = row['ItemGet'] * row['Item Price']
+                    total_price += price
                     ROW = []
                     ROW.append(str(row['Item Code']))
                     ROW.append(str(row['Item Name']))
-                    ROW.append(str(row['Item Qty']))
-                    ROW.append(str(row['ItemGet']))
+                    ROW.append(row['Item Qty'])
+                    ROW.append(row['ItemGet'])
+                    ROW.append(row['Item Price'])
+                    ROW.append(price)
                     LIST.append(ROW)
+                LIST.append(['', 'Total', count, get, '', total_price])
             return LIST
         except Exception as e:
             self.popup_error()
@@ -431,7 +439,7 @@ class Ui_MainWindow(object):
 
     def add_item(self) -> None:
         try:
-            item_ID = self.item_ID.text()
+            item_ID = self.item_ID.text().strip()
             self.item_ID.clear()
             if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())) or self.all_order_list.empty:
                 return
@@ -521,7 +529,6 @@ class Ui_MainWindow(object):
                 else:
                     self.list_by_item[self.ID][SKU]['Qty'] += 1
                     self.list_by_item[self.ID][SKU]['carton code'].add(carton_code)
-            print(self.list_by_item)
             self.id_add_label.setText(f'ID : {self.ID} ถูกเพิ่ม')
         except Exception as e:
             self.popup_error()
@@ -535,7 +542,6 @@ class Ui_MainWindow(object):
                         if self.list_by_item[self.ID][SKU]['Qty'] == 0:
                             self.list_by_item[self.ID][SKU]['carton code'] = set()
                         self.id_add_label.setText(f'ID : {self.ID} ถูกลด')
-            print(self.list_by_item)
         except Exception as e:
             self.popup_error()
 
@@ -655,10 +661,14 @@ class Ui_MainWindow(object):
                 x = msg.exec_()
                 return
 
-            ListOfList = self.get_order_list(cartons)
-            if  len(ListOfList) == 1: return # No item found
-            
             custumerName = self.customer_name.text()
+            ListOfList = self.get_order_list(cartons)
+            if len(ListOfList) == 1: return # No item found
+            if not cartons:
+                df = pd.DataFrame(ListOfList[1:], columns = ['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้', 'ราคาต่อชิ้น', 'ราคารวม'])
+                df.to_excel(f'./file/{custumerName}.xlsx', engine='openpyxl', index=False)
+                return
+            
             if cartons:
                 file_name = f"./file/{custumerName} cartons.pdf"
             else:
@@ -692,7 +702,7 @@ class Ui_MainWindow(object):
                                                 rowHeights=0.4*inch)
             else:
                 td = Table(ListOfList,style = self.cartons_table_style,
-                                                colWidths=[1*inch,4*inch,1*inch,1*inch],
+                                                colWidths=[0.8*inch,3.5*inch,0.8*inch,0.8*inch,0.8*inch,0.8*inch],
                                                 rowHeights=0.4*inch)
             Story.append(td)
             Story.append(Spacer(1, 24))
@@ -713,17 +723,15 @@ class Ui_MainWindow(object):
                     Story.append(Paragraph(f"Cartons Code : {c}", styles["Normals"]))
                     Story.append(Spacer(1, 24))
                     ListOfList = []
-                    ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
-                    Qty = total = 0
+                    ListOfList.append(['Item', 'Qty(Pcs)'])
+                    Qty = 0
                     for ItemName in carton_dict[c]:
                         item = self.order_list.loc[self.order_list['Item Name'] == ItemName].iloc[0]
                         Qty += self.carton_count[ItemName][c]
-                        weight = self.carton_count[ItemName][c]*item["Weight"]
-                        total += weight
-                        ListOfList.append([item['Item Name'], self.carton_count[ItemName][c], item['Weight'], f'{weight}'])
-                    ListOfList.append(['total', f'{Qty}', '', f'{total}'])
+                        ListOfList.append([item['Item Name'], self.carton_count[ItemName][c]])
+                    ListOfList.append(['total', f'{Qty}'])
                     td = Table(ListOfList,style = self.cartons_table_style,
-                                                    colWidths=[4*inch,1*inch,1*inch,1*inch],
+                                                    colWidths=[6*inch,1*inch],
                                                     rowHeights=0.4*inch)
                     Story.append(td)
                     Story.append(PageBreak())
@@ -735,12 +743,12 @@ class Ui_MainWindow(object):
                     Story.append(Paragraph(f"Cartons Code : nan", styles["Normals"]))
                     Story.append(Spacer(1, 24))
                     ListOfList = []
-                    ListOfList.append(['Item', 'Qty(Pcs)', 'unit (g)', 'total (g)'])
+                    ListOfList.append(['Item', 'Qty(Pcs)'])
                     for index, row in self.order_list.loc[self.order_list['ItemGet'] == 0].iterrows():
-                        ListOfList.append([row['Item Name'], '0', row['Weight'], '0'])
-                    ListOfList.append(['total', '0', '', '0'])
+                        ListOfList.append([row['Item Name'], '0'])
+                    ListOfList.append(['total', '0'])
                     td = Table(ListOfList,style = self.cartons_table_style,
-                                                    colWidths=[4*inch,1*inch,1*inch,1*inch],
+                                                    colWidths=[6*inch,1*inch],
                                                     rowHeights=0.4*inch)
                     Story.append(td)
             try:
