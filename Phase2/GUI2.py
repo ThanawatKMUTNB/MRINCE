@@ -6,7 +6,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import  TA_LEFT
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, mm
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 
@@ -673,9 +673,9 @@ class Ui_MainWindow(object):
                 file_name = f"./file/{custumerName} cartons.pdf"
             else:
                 file_name = f"./file/{custumerName}.pdf"
-            doc = SimpleDocTemplate(file_name,pagesize=A4,
+            doc = SimpleDocTemplate(file_name,pagesize=(150*mm, 100*mm),
                                     rightMargin=100,leftMargin=100,
-                                    topMargin=20,bottomMargin=20)
+                                    topMargin=15,bottomMargin=15)
             pdfmetrics.registerFont(TTFont('THSarabunNew', './src/THSarabunNew.ttf'))
             Story=[]
             styles=getSampleStyleSheet()
@@ -698,12 +698,14 @@ class Ui_MainWindow(object):
             Story.append(Spacer(1, 24))
             if cartons:
                 td = Table(ListOfList,style = self.cartons_table_style
-                                                ,colWidths=[1*inch,5*inch,1*inch],
-                                                rowHeights=0.4*inch)
+                                                ,colWidths=[20*mm, 100*mm, 20*mm],
+                                                rowHeights=0.4*inch,
+                                                repeatRows=1)
             else:
                 td = Table(ListOfList,style = self.cartons_table_style,
                                                 colWidths=[0.8*inch,3.5*inch,0.8*inch,0.8*inch,0.8*inch,0.8*inch],
-                                                rowHeights=0.4*inch)
+                                                rowHeights=0.4*inch,
+                                                repeatRows=1)
             Story.append(td)
             Story.append(Spacer(1, 24))
             Story.append(Paragraph(f'ผู้จัดลงลัง : {employee_name}', styles["Normals"]))
@@ -731,8 +733,9 @@ class Ui_MainWindow(object):
                         ListOfList.append([item['Item Name'], self.carton_count[ItemName][c]])
                     ListOfList.append(['total', f'{Qty}'])
                     td = Table(ListOfList,style = self.cartons_table_style,
-                                                    colWidths=[6*inch,1*inch],
-                                                    rowHeights=0.4*inch)
+                                                    colWidths=[120*mm, 20*mm],
+                                                    rowHeights=0.4*inch,
+                                                    repeatRows=1)
                     Story.append(td)
                     Story.append(PageBreak())
                 # Add nan page
@@ -748,8 +751,9 @@ class Ui_MainWindow(object):
                         ListOfList.append([row['Item Name'], '0'])
                     ListOfList.append(['total', '0'])
                     td = Table(ListOfList,style = self.cartons_table_style,
-                                                    colWidths=[6*inch,1*inch],
-                                                    rowHeights=0.4*inch)
+                                                    colWidths=[120*mm, 20*mm],
+                                                    rowHeights=0.4*inch,
+                                                    repeatRows=1)
                     Story.append(td)
             try:
                 doc.build(Story)
