@@ -146,6 +146,7 @@ class dm():
             if not (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
             product = row['Product Name']
             product_name = row['Product Name'].split('(')
+            product_engname = product_name[-1].split(')')[-1]
             if len(product_name) > 2:
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
@@ -157,7 +158,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text_barcode(img, product_engname, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
@@ -199,6 +200,7 @@ class dm():
             if (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
             product = row['Product Name']
             product_name = row['Product Name'].split('(')
+            product_engname = product_name[-1].split(')')[-1]
             if len(product_name) > 2:
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
@@ -210,7 +212,7 @@ class dm():
             text_color = (0,0,0)   #black
             self.draw_multiple_line_text_barcode(img, product_weight, fonts, text_color, height*(2/10))
             self.draw_multiple_line_text_barcode(img, product_name, fonts, text_color, height*(3/10))
-            #self.draw_multiple_line_text_barcode(img, product_sku, fonts, text_color, height*(4/10))
+            self.draw_multiple_line_text_barcode(img, product_engname, fonts, text_color, height*(4/10))
             code = self.createbarcode(product_sku)
             code = code.resize((int(width/1.1),int(height/3.5)))
             img.paste(code,(int(width*(1/14)),int(height*(1/2))))
