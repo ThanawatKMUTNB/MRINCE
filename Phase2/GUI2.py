@@ -34,6 +34,19 @@ def err(func):
             error_dialog.exec_()
     return wrapper
 
+def get_weight(name):
+    # search for unit in item name
+    bracket = re.search(r"\((\d+).+\)", name)
+    if bracket != None:
+        u = re.search(r'\d+', bracket.group()[1:-1])
+        if u != None: 
+            unit = u.group()
+        else:
+            unit = 100
+    else:
+        unit = 100
+    return unit
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.MainWindow = MainWindow
@@ -369,7 +382,10 @@ class Ui_MainWindow(object):
         self.order_list = self.csv.loc[self.csv['No.'] == self.ID][['Item Code', 'Item Name', 'Item Qty', 'Item Price']].reset_index(drop=True)
         self.order_list = self.order_list.assign(ItemGet=0)
         self.order_list['BoxNo'] = [set() for i in range(len(self.order_list))]
-        self.order_list['Weight'] = [int(re.search(r'\d+', x).group()) for x in [re.search(r"\((\d+).+\)", name).group()[1:-1]for name in self.order_list['Item Name']]]
+        weight = []
+        for name in self.order_list['Item Name']:
+            weight.append(get_weight(name))
+        self.order_list['Weight'] = weight
         for SKU in self.order_list['Item Name']:
             self.Item_set.add(SKU)
 
@@ -496,7 +512,7 @@ class Ui_MainWindow(object):
                 'Item Name':item_name,
                 'Item Qty': 0,
                 'ItemGet': 1,
-                'Weight': int(re.search(r'\d+',re.search(r"\((\d+).+\)", item_name).group()[1:-1]).group())
+                'Weight': int(get_weight(item_name))
             }
             if not self.order_list.empty:
                 df = pd.DataFrame(row, index=[0])
@@ -551,17 +567,7 @@ class Ui_MainWindow(object):
             for SKU in self.list_by_item[cartons_number]:
                 item_name = self.list_by_item[cartons_number][SKU]['Item']
                 qty = self.list_by_item[cartons_number][SKU]['Qty']
-
-                # search for unit in item name
-                bracket = re.search(r"\((\d+).+\)", item_name)
-                if bracket != None:
-                    u = re.search(r'\d+', bracket.group()[1:-1])
-                    if u != None: 
-                        unit = u.group()
-                    else:
-                        unit = 100
-                else:
-                    unit = 100
+                unit = get_weight(item_name)
 
                 if len(self.list_by_item[cartons_number][SKU]['carton code']) == 0:
                     continue
