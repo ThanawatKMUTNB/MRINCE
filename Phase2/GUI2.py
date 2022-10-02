@@ -145,13 +145,31 @@ class Ui_MainWindow(object):
         self.clearBtn.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.clearBtn.setObjectName("clearBtn")
         self.gridLayout.addWidget(self.clearBtn, 4, 2, 1, 1)
+
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         
         self.item_ID = QtWidgets.QLineEdit(self.centralwidget)
         self.item_ID.setMinimumSize(QtCore.QSize(0, 30))
         self.item_ID.setMaximumSize(QtCore.QSize(16777215, 30))
         self.item_ID.setFont(font)
         self.item_ID.setObjectName("item_ID")
-        self.gridLayout.addWidget(self.item_ID, 3, 1, 1, 2)
+        self.horizontalLayout_4.addWidget(self.item_ID)
+
+        self.quantity_edit_text = QtWidgets.QLineEdit(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.quantity_edit_text.sizePolicy().hasHeightForWidth())
+        self.quantity_edit_text.setSizePolicy(sizePolicy)
+        self.quantity_edit_text.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.quantity_edit_text.setFont(font)
+        self.quantity_edit_text.setText("")
+        self.quantity_edit_text.setMaxLength(32765)
+        self.quantity_edit_text.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.quantity_edit_text.setObjectName("quantity_edit_text")
+        self.horizontalLayout_4.addWidget(self.quantity_edit_text)
+        self.gridLayout.addLayout(self.horizontalLayout_4, 3, 1, 1, 2)
 
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
@@ -326,6 +344,7 @@ class Ui_MainWindow(object):
         self.employee_name.setPlaceholderText(_translate("MainWindow", "ใส่ชื่อพนักงาน"))
         self.box_no.setPlaceholderText(_translate("MainWindow", "กล่องที่"))
         self.pushButton.setText(_translate("MainWindow", "End of Program"))
+        self.quantity_edit_text.setPlaceholderText(_translate("MainWindow", "จำนวน"))
 
     @err
     def load_file(self, *args, **kwargs) -> None:
@@ -463,46 +482,63 @@ class Ui_MainWindow(object):
         if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())) or self.all_order_list.empty:
             return
         SKU = self.readbarcode(item_ID)
-        if len(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True)) == 0 : return
-        item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True).iloc[0]['Item Name']
+
+        n = self.get_quantity()
+        if n == 0:
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle("คำเตือน")
+            msg.setText("ช่องจำนวนสามารถใส่ได้แค่เพียงตัวเลขเท่านั้น")
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            x = msg.exec_()
+
+        if len(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True)) == 0 : return               # no item match with SKU in CSV
+        item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True).iloc[0]['Item Name']    # select match item
         found = False
-        carton_code = self.box_no.text()
-        if carton_code == '' : return
+        carton_code = self.box_no.text().strip()
+        if carton_code == '' : return           # no carton code defind
         for index,row in self.order_list.iterrows():
             if row['Item Code'] == SKU:
+                # add mode
                 if self.add_mode:
-                    self.order_list.loc[index,'ItemGet'] += 1
-                    self.order_list.loc[index,'BoxNo'].add(carton_code)
+                    self.order_list.loc[index,'ItemGet'] += n           # add quantity
+                    self.order_list.loc[index,'BoxNo'].add(carton_code) # add carton code to set
 
                     # add Carton Count
                     if item_name not in self.carton_count.keys():
                         self.carton_count[item_name] = {
-                            carton_code : 1
+                            carton_code : n
                         }
                     else:
-
-                        if carton_code not in self.carton_count[item_name].keys():
-                            self.carton_count[item_name][carton_code] = 1
+                        if carton_code not in self.carton_count[item_name].keys():  # no carton code found in carton count
+                            self.carton_count[item_name][carton_code] = n           # create carton count
                         else:
-                            self.carton_count[item_name][carton_code] += 1
+                            self.carton_count[item_name][carton_code] += n          # add carton count
 
                     if '' in self.order_list.loc[index,'BoxNo']:
                         self.order_list.loc[index,'BoxNo'].remove('')
-                    self.add_list_by_item(SKU, item_name, carton_code)
+                    self.add_list_by_item(SKU, item_name, carton_code, n)
+
+                # sub mode
                 elif self.order_list.loc[index,'ItemGet'] > 0:
-                    if item_name in self.carton_count.keys():
+                    if item_name in self.carton_count.keys():                       # found in carton count
                         if carton_code in self.carton_count[item_name].keys(): 
-                            self.carton_count[item_name][carton_code] -= 1
-                            self.order_list.loc[index,'ItemGet'] -= 1
+
+                            self.carton_count[item_name][carton_code] -= n
+                            if self.carton_count[item_name][carton_code] < 0: self.carton_count[item_name][carton_code] = 0
+
+                            self.order_list.loc[index,'ItemGet'] -= n
+                            if self.order_list.loc[index,'ItemGet'] < 0: self.order_list.loc[index,'ItemGet'] = 0
+
                             if self.carton_count[item_name][carton_code] == 0: 
                                 self.carton_count[item_name].pop(carton_code, None) # remove carton if = 0
                                 if (item_name not in self.Item_set) and (sum(self.carton_count[item_name].values()) == 0):  # item not in original order list
                                     self.order_list.drop([index], axis=0, inplace=True)
+
                         if len(self.carton_count[item_name].keys()) == 0 : self.carton_count.pop(item_name, None)
                     if item_name in self.Item_set:
                         if self.order_list.loc[index,'ItemGet'] == 0:
                             self.order_list.loc[index,'BoxNo'] = set([''])
-                    self.sub_list_by_item(SKU)
+                    self.sub_list_by_item(SKU, n)
                 found = True
                 
                 break
@@ -528,34 +564,37 @@ class Ui_MainWindow(object):
         self.show_item_list()
 
     @err
-    def add_list_by_item(self, SKU, item_name, carton_code, *args, **kwargs):
+    def add_list_by_item(self, SKU, item_name, carton_code, n:int, *args, **kwargs):
         if self.ID not in self.list_by_item.keys():
             self.list_by_item[self.ID] = {}
             self.list_by_item[self.ID][SKU] = {
                 'Item' : item_name,
                 'carton code' : set(carton_code),
-                'Qty' : 1
+                'Qty' : n
             }
         else:
             if SKU not in self.list_by_item[self.ID].keys():
                 self.list_by_item[self.ID][SKU] = {
                 'Item' : item_name,
                 'carton code' : set(carton_code),
-                'Qty' : 1
+                'Qty' : n
             }
             else:
-                self.list_by_item[self.ID][SKU]['Qty'] += 1
+                self.list_by_item[self.ID][SKU]['Qty'] += n
                 self.list_by_item[self.ID][SKU]['carton code'].add(carton_code)
         self.id_add_label.setText(f'ID : {self.ID} ถูกเพิ่ม')
 
     @err
-    def sub_list_by_item(self, SKU, *args, **kwargs):
+    def sub_list_by_item(self, SKU, n, *args, **kwargs):
         if self.ID in self.list_by_item.keys():
             if SKU in self.list_by_item[self.ID].keys():
                 if self.list_by_item[self.ID][SKU]['Qty'] > 0:
-                    self.list_by_item[self.ID][SKU]['Qty'] -= 1
-                    if self.list_by_item[self.ID][SKU]['Qty'] == 0:
-                        self.list_by_item[self.ID][SKU]['carton code'] = set()
+
+                    self.list_by_item[self.ID][SKU]['Qty'] -= n
+                    if self.list_by_item[self.ID][SKU]['Qty'] < 0 : self.list_by_item[self.ID][SKU]['Qty'] = 0
+
+                    if self.list_by_item[self.ID][SKU]['Qty'] == 0: self.list_by_item[self.ID][SKU]['carton code'] = set()
+                    
                     self.id_add_label.setText(f'ID : {self.ID} ถูกลด')
 
     @err
@@ -671,8 +710,7 @@ class Ui_MainWindow(object):
         ListOfList = self.get_order_list(cartons)
         if len(ListOfList) == 1: return # No item found
         if not cartons:
-            df = pd.DataFrame(ListOfList[1:], columns = ['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้', 'ราคาต่อชิ้น', 'ราคารวม'])
-            df.to_csv(f'./file/{custumerName}.csv', encoding='utf-8', index=False)
+            self.save_to_csv(ListOfList[1:], custumerName)
             return
         
         if cartons:
@@ -786,6 +824,17 @@ class Ui_MainWindow(object):
                 text = f"{[x for x in carton]}".replace("'","")[1:-1]
             s.append(text)
         return s
+
+    def save_to_csv(self, ListOfList, custumerName):
+        df = pd.DataFrame(ListOfList, columns = ['SKU', 'สินค้า', 'จำนวนที่สั่ง', 'จำนวนที่ได้', 'ราคาต่อชิ้น', 'ราคารวม'])
+        df.to_csv(f'./file/{custumerName}.csv', encoding='utf-8', index=False)
+
+    def get_quantity(self) -> int:
+        text = self.quantity_edit_text.text().strip()
+        if len(text) == 0: return 1
+        if re.match(r'^\d+$', text):
+            return int(text)
+        else: return 0
         
 if __name__ == '__main__':
     import sys
