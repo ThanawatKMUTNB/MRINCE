@@ -490,6 +490,7 @@ class Ui_MainWindow(object):
             msg.setText("ช่องจำนวนสามารถใส่ได้แค่เพียงตัวเลขเท่านั้น")
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             x = msg.exec_()
+            self.quantity_edit_text.clear()
 
         if len(self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True)) == 0 : return               # no item match with SKU in CSV
         item_name = self.all_order_list.loc[self.all_order_list['Item Code'] == SKU].reset_index(drop=True).iloc[0]['Item Name']    # select match item
@@ -594,7 +595,7 @@ class Ui_MainWindow(object):
                     if self.list_by_item[self.ID][SKU]['Qty'] < 0 : self.list_by_item[self.ID][SKU]['Qty'] = 0
 
                     if self.list_by_item[self.ID][SKU]['Qty'] == 0: self.list_by_item[self.ID][SKU]['carton code'] = set()
-                    
+
                     self.id_add_label.setText(f'ID : {self.ID} ถูกลด')
 
     @err
