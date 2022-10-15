@@ -45,7 +45,7 @@ def get_weight(name):
             unit = 100
     else:
         unit = 100
-    return unit
+    return int(unit)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -561,7 +561,7 @@ class Ui_MainWindow(object):
                     }
                 else:
                     self.carton_count[item_name][carton_code] = 1
-                self.add_list_by_item(SKU, item_name, carton_code)
+                self.add_list_by_item(SKU, item_name, carton_code, n)
         self.show_item_list()
 
     @err
@@ -633,7 +633,7 @@ class Ui_MainWindow(object):
             'total (g)' : df['total (g)'].sum(),
         }
         df = pd.concat([df, pd.DataFrame(row, index=[0])], ignore_index=True)
-        df.to_excel('./file/Packing list by item.xlsx', engine='openpyxl', index=False)
+        df.to_excel(f'./file/Packing list by item {self.customer_name.text()}.xlsx', engine='openpyxl', index=False)
 
     @err
     def readbarcode(self, num : str, *args, **kwargs) -> str:
