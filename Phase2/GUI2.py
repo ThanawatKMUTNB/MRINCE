@@ -47,6 +47,13 @@ def get_weight(name):
         unit = 100
     return int(unit)
 
+class Validator(QtGui.QValidator):
+    def validate(self, string, pos):
+        return QtGui.QValidator.Acceptable, string.upper(), pos
+        # for old code still using QString, use this instead
+        # string.replace(0, string.count(), string.toUpper())
+        # return QtGui.QValidator.Acceptable, pos
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         self.MainWindow = MainWindow
@@ -150,6 +157,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         
         self.item_ID = QtWidgets.QLineEdit(self.centralwidget)
+        self.validator = Validator(self.MainWindow)
+        self.item_ID.setValidator(self.validator)
         self.item_ID.setMinimumSize(QtCore.QSize(0, 30))
         self.item_ID.setMaximumSize(QtCore.QSize(16777215, 30))
         self.item_ID.setFont(font)
@@ -479,9 +488,12 @@ class Ui_MainWindow(object):
     def add_item(self, *args, **kwargs) -> None:
         item_ID = self.item_ID.text().strip()
         self.item_ID.clear()
-        if (item_ID == "") or (len(item_ID) != 13) or (not (item_ID.isnumeric())) or self.all_order_list.empty:
+        if (item_ID == "") or self.all_order_list.empty: # nothing in text box
             return
-        SKU = self.readbarcode(item_ID)
+        if (len(item_ID) == 13) and (item_ID.isnumeric()) : # check if item_ID
+            SKU = self.readbarcode(item_ID)
+        else:
+            SKU = item_ID
 
         n = self.get_quantity()
         if n == 0:
