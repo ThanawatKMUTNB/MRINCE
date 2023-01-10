@@ -137,9 +137,9 @@ class dm():
     def Barcode_Copy(self,df):     #1
         width = 400
         height = 600
-        fonts = ImageFont.truetype(self.font, size=30)
+        fonts = ImageFont.truetype(self.font, size=25)
         sku_font = ImageFont.truetype(self.font, size=40)
-        logo =  Image.open(os.path.join("src","logo-web.png"))
+        logo =  Image.open(os.path.join("src","logoB.png"))
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -157,13 +157,17 @@ class dm():
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
             btm_text = " ".join([product_weight,product_sku])
+            product_name = product_name[:25] if len(product_name) > 25 else product_name
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width*1.3),int(height*(1/1.6))))
+            logo = logo.resize((int(width/2),int(height*(1/8))))
+            img.paste(logo,(int(width/4),1))
+            img.paste(code,(-60,int(height*(1/4.5))))
+            self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
+            self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
             self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
             self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
             self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
-            code = self.createbarcode(product_sku)
-            code = code.resize((int(width*1.3),int(height*(1/2.5))))
-            img.paste(code,(-60,int(height*(1/2.5))))
-            img.paste(logo,(int(width/5),int(height/15)))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
@@ -195,9 +199,9 @@ class dm():
     def Product_label(self,df):    #3 filter veg and fruits
         width = 400
         height = 600
-        fonts = ImageFont.truetype(self.font, size=30)
+        fonts = ImageFont.truetype(self.font, size=25)
         sku_font = ImageFont.truetype(self.font, size=40)
-        logo =  Image.open(os.path.join("src","logo-web.png"))
+        logo =  Image.open(os.path.join("src","logoB.png"))
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -215,13 +219,17 @@ class dm():
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
             btm_text = " ".join([product_weight,product_sku])
+            product_name = product_name[:25] if len(product_name) > 25 else product_name
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width*1.3),int(height*(1/1.6))))
+            logo = logo.resize((int(width/2),int(height*(1/8))))
+            img.paste(logo,(int(width/4),1))
+            img.paste(code,(-60,int(height*(1/4.5))))
+            self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
+            self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
             self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
             self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
             self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
-            code = self.createbarcode(product_sku)
-            code = code.resize((int(width*1.3),int(height*(1/2.5))))
-            img.paste(code,(-60,int(height*(1/2.5))))
-            img.paste(logo,(int(width/5),int(height/15)))
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('FoodBarcode_pages.pdf', save_all=True, append_images=image_list[1:])
