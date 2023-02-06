@@ -134,6 +134,39 @@ class dm():
         for c in alpha: chr_list.append(str(chr(int(c))))   
         return str("".join(chr_list)+num[-4:])
     
+    def CtButton(self,df):
+        width = 297*4
+        height = 210*4
+        fonts = ImageFont.truetype(self.font, size=int(height/10))
+        image_list = []
+        df.sort_values(by=['Product Name'],inplace=True)
+        for index, row in df.iterrows():
+            if (row['Product SKU'][:2] == 'CT'): continue
+            product = row['Product Name']
+            product_name = product.split('(')
+            product_engname = product_name[-1].split(')')[-1]
+            if len(product_name) > 2:
+                product_name.pop()
+                product_name = "".join(product_name)[:-2]
+            else: product_name = product_name[0][:-1]
+            product_weight = f"{re.findall('[0-9]+',product)[0]} g"
+            product_sku = row['Product SKU']
+            img = Image.new('RGB', (width, height), color='white')
+            ImageDraw.Draw(img)       
+            text_color = (0,0,0)   #black
+            product_name = product_name[:25] if len(product_name) > 25 else product_name
+            product_engname = product_engname[:25] if len(product_engname) > 25 else product_engname
+            product_name = " ".join([product_name,product_engname])
+            code = self.createbarcode(product_sku)
+            code = code.resize((int(width/1.5),int(height*(1/2))))
+            img.paste(code,(int(width/6),int(height*(1/2))))
+            self.draw_multiple_line_text2(img, product_sku, ImageFont.truetype(self.font, size=int(height/15)), text_color, int(height*(1/20)),int(width*(1/20)))
+            self.draw_multiple_line_text(img, str(row['Product ID']), fonts, text_color, height*(1/5))
+            self.draw_multiple_line_text(img, product_name, fonts, text_color, height*(1/3))
+            image_list.append(img.convert('RGB'))
+        image_list[0].save('CT_pages.pdf', save_all=True, append_images=image_list[1:])
+        print("CT complete")
+    
         # def Barcode_Copy(self,df):     #1
             # width = 400
             # height = 600
@@ -205,8 +238,7 @@ class dm():
             img.paste(bg,(0,0),bg)
             self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(2.7/10),width*0.05)
             self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(3.2/10),width*0.05)
-            subloop = int(row['Line Item Quantity'])
-            for copy in range(subloop): image_list.append(img.convert('RGB'))
+            image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Barcode Copy Complete")
     
@@ -280,7 +312,7 @@ class dm():
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
-            if (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
+            if (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT' or row['Product SKU'][:2] == 'CT'): continue
             product = row['Product Name']
             product_name = row['Product Name'].split('(')
             product_engname = product_name[-1].split(')')[-1]
@@ -304,8 +336,7 @@ class dm():
             img.paste(bg,(0,0),bg)
             self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(2.7/10),width*0.05)
             self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(3.2/10),width*0.05)
-            subloop = int(row['Line Item Quantity'])
-            for copy in range(subloop): image_list.append(img.convert('RGB'))
+            image_list.append(img.convert('RGB'))
         image_list[0].save('FoodBarcode_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Food Barcode Complete")
     
