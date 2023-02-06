@@ -138,8 +138,7 @@ class dm():
         width = 400
         height = 600
         fonts = ImageFont.truetype(self.font, size=25)
-        sku_font = ImageFont.truetype(self.font, size=40)
-        logo =  Image.open(os.path.join("src","logoB.png"))
+        bg = Image.open(os.path.join("src","Ince_bg.png"))
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -151,23 +150,22 @@ class dm():
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
             else: product_name = product_name[0][:-1]
-            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            product_weight = f"{re.findall('[0-9]+',product)[0]} g"
             product_sku = row['Product SKU']
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            btm_text = " ".join([product_weight,product_sku])
             product_name = product_name[:25] if len(product_name) > 25 else product_name
+            product_name = " ".join([product_name,product_weight])
+            product_engname = product_engname[:25] if len(product_engname) > 25 else product_engname
+            product_engname = " ".join([product_engname,product_sku])
             code = self.createbarcode(product_sku)
-            code = code.resize((int(width*1.2),int(height*(1/1.45))))
-            logo = logo.resize((int(width/2),int(height*(1/8))))
-            img.paste(logo,(int(width/4),1))
-            img.paste(code,(-40,int(height*(1/5.5))))
-            self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
-            self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
-            self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
-            self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
-            self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
+            code = code.resize((int(width*1.3),int(height*(2.3/6))))
+            bg = bg.resize((int(width),int(height)))
+            img.paste(code,(-60,int(height*(1/2.5))))
+            img.paste(bg,(0,0),bg)
+            self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(2.7/10),width*0.05)
+            self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(3.2/10),width*0.05)
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
@@ -200,8 +198,7 @@ class dm():
         width = 400
         height = 600
         fonts = ImageFont.truetype(self.font, size=25)
-        sku_font = ImageFont.truetype(self.font, size=40)
-        logo =  Image.open(os.path.join("src","logoB.png"))
+        bg = Image.open(os.path.join("src","Ince_bg.png"))
         image_list = []
         df.sort_values(by=['Product Name'],inplace=True)
         for index, row in df.iterrows():
@@ -213,23 +210,22 @@ class dm():
                 product_name.pop()
                 product_name = "".join(product_name)[:-2]
             else: product_name = product_name[0][:-1]
-            product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            product_weight = f"{re.findall('[0-9]+',product)[0]} g"
             product_sku = row['Product SKU']
             img = PIL.Image.new('RGB', (width, height), color='white')
             ImageDraw.Draw(img)       
             text_color = (0,0,0)   #black
-            btm_text = " ".join([product_weight,product_sku])
             product_name = product_name[:25] if len(product_name) > 25 else product_name
+            product_name = " ".join([product_name,product_weight])
+            product_engname = product_engname[:25] if len(product_engname) > 25 else product_engname
+            product_engname = " ".join([product_engname,product_sku])
             code = self.createbarcode(product_sku)
-            code = code.resize((int(width*1.2),int(height*(1/1.45))))
-            logo = logo.resize((int(width/2),int(height*(1/8))))
-            img.paste(logo,(int(width/4),1))
-            img.paste(code,(-40,int(height*(1/5.5))))
-            self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
-            self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
-            self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
-            self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
-            self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
+            code = code.resize((int(width*1.3),int(height*(2.3/6))))
+            bg = bg.resize((int(width),int(height)))
+            img.paste(code,(-60,int(height*(1/2.5))))
+            img.paste(bg,(0,0),bg)
+            self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(2.7/10),width*0.05)
+            self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(3.2/10),width*0.05)
             subloop = int(row['Line Item Quantity'])
             for copy in range(subloop): image_list.append(img.convert('RGB'))
         image_list[0].save('FoodBarcode_pages.pdf', save_all=True, append_images=image_list[1:])
