@@ -134,6 +134,45 @@ class dm():
         for c in alpha: chr_list.append(str(chr(int(c))))   
         return str("".join(chr_list)+num[-4:])
     
+        # def Barcode_Copy(self,df):     #1
+            # width = 400
+            # height = 600
+            # fonts = ImageFont.truetype(self.font, size=25)
+            # sku_font = ImageFont.truetype(self.font, size=40)
+            # logo =  Image.open(os.path.join("src","logoB.png"))
+            # image_list = []
+            # df.sort_values(by=['Product Name'],inplace=True)
+            # for index, row in df.iterrows():
+            #     if not (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
+            #     product = row['Product Name']
+            #     product_name = row['Product Name'].split('(')
+            #     product_engname = product_name[-1].split(')')[-1]
+            #     if len(product_name) > 2:
+            #         product_name.pop()
+            #         product_name = "".join(product_name)[:-2]
+            #     else: product_name = product_name[0][:-1]
+            #     product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            #     product_sku = row['Product SKU']
+            #     img = PIL.Image.new('RGB', (width, height), color='white')
+            #     ImageDraw.Draw(img)       
+            #     text_color = (0,0,0)   #black
+            #     btm_text = " ".join([product_weight,product_sku])
+            #     product_name = product_name[:25] if len(product_name) > 25 else product_name
+            #     code = self.createbarcode(product_sku)
+            #     code = code.resize((int(width*1.2),int(height*(1/1.45))))
+            #     logo = logo.resize((int(width/2),int(height*(1/8))))
+            #     img.paste(logo,(int(width/4),1))
+            #     img.paste(code,(-40,int(height*(1/5.5))))
+            #     self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
+            #     self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
+            #     self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
+            #     self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
+            #     self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
+            #     subloop = int(row['Line Item Quantity'])
+            #     for copy in range(subloop): image_list.append(img.convert('RGB'))
+            # image_list[0].save('Quantity_pages.pdf', save_all=True, append_images=image_list[1:])
+            # print("Barcode Copy Complete")
+
     def Barcode_Copy(self,df):     #1
         width = 400
         height = 600
@@ -193,6 +232,45 @@ class dm():
 
         image_list[0].save('Product_pages.pdf', save_all=True, append_images=image_list[1:])
         print("Product type Complete")
+
+        # def Product_label(self,df):    #3 filter veg and fruits
+            # width = 400
+            # height = 600
+            # fonts = ImageFont.truetype(self.font, size=25)
+            # sku_font = ImageFont.truetype(self.font, size=40)
+            # logo =  Image.open(os.path.join("src","logoB.png"))
+            # image_list = []
+            # df.sort_values(by=['Product Name'],inplace=True)
+            # for index, row in df.iterrows():
+            #     if (row['Product SKU'][:2] == 'VB' or row['Product SKU'][:2] == 'FT'): continue
+            #     product = row['Product Name']
+            #     product_name = row['Product Name'].split('(')
+            #     product_engname = product_name[-1].split(')')[-1]
+            #     if len(product_name) > 2:
+            #         product_name.pop()
+            #         product_name = "".join(product_name)[:-2]
+            #     else: product_name = product_name[0][:-1]
+            #     product_weight = f"{re.findall('[0-9]+',product)[0]} กรัม"
+            #     product_sku = row['Product SKU']
+            #     img = PIL.Image.new('RGB', (width, height), color='white')
+            #     ImageDraw.Draw(img)       
+            #     text_color = (0,0,0)   #black
+            #     btm_text = " ".join([product_weight,product_sku])
+            #     product_name = product_name[:25] if len(product_name) > 25 else product_name
+            #     code = self.createbarcode(product_sku)
+            #     code = code.resize((int(width*1.2),int(height*(1/1.45))))
+            #     logo = logo.resize((int(width/2),int(height*(1/8))))
+            #     img.paste(logo,(int(width/4),1))
+            #     img.paste(code,(-40,int(height*(1/5.5))))
+            #     self.draw_multiple_line_text2(img, "www.mrince.com", fonts, text_color, height*(1/10),width/4)
+            #     self.draw_multiple_line_text2(img, "PRODUCT OF THAILAND", fonts, text_color, height*(1.5/10),width/6)
+            #     self.draw_multiple_line_text2(img, product_name, fonts, text_color, height*(8/10),width*0.05)
+            #     self.draw_multiple_line_text2(img, product_engname, fonts, text_color, height*(8.5/10),width*0.05)
+            #     self.draw_multiple_line_text2(img, btm_text, sku_font, text_color, height*(9/10),width*0.05)
+            #     subloop = int(row['Line Item Quantity'])
+            #     for copy in range(subloop): image_list.append(img.convert('RGB'))
+            # image_list[0].save('FoodBarcode_pages.pdf', save_all=True, append_images=image_list[1:])
+            # print("Food Barcode Complete")
     
     def Product_label(self,df):    #3 filter veg and fruits
         width = 400
